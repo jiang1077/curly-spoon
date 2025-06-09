@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-lg">
+                <div class="card-header text-center bg-primary-custom text-white">
+                    <h4><i class="fas fa-sign-in-alt me-2"></i>用户登录</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- 邮箱 -->
+                        <div class="mb-3">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.email.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- 密码 -->
+                        <div class="mb-3">
+                            {{ form.password.label(class="form-label") }}
+                            <div class="input-group">
+                                {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), id="password") }}
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="fas fa-eye" id="passwordIcon"></i>
+                                </button>
+                            </div>
+                            {% if form.password.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.password.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- 记住我 -->
+                        <div class="mb-3 form-check">
+                            {{ form.remember_me(class="form-check-input") }}
+                            {{ form.remember_me.label(class="form-check-label") }}
+                        </div>
+                        
+                        <!-- 登录按钮 -->
+                        <div class="d-grid mb-3">
+                            {{ form.submit(class="btn btn-primary btn-lg") }}
+                        </div>
+                        
+                        <!-- 忘记密码 -->
+                        <div class="text-center mb-3">
+                            <a href="{{ url_for('auth.forgot_password') }}" class="text-muted">忘记密码？</a>
+                        </div>
+                        
+                        <!-- 分隔线 -->
+                        <hr class="my-4">
+                        
+                        <!-- 注册链接 -->
+                        <div class="text-center">
+                            <p class="text-muted">还没有账户？</p>
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-user-plus me-2"></i>立即注册
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 快速提示 -->
+            <div class="card mt-3">
+                <div class="card-body text-center">
+                    <h6 class="text-primary-custom">
+                        <i class="fas fa-info-circle me-2"></i>提示
+                    </h6>
+                    <p class="text-muted small mb-0">
+                        如果您遇到登录问题，请联系我们的24小时客服
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    // 密码显示/隐藏切换
+    $('#togglePassword').click(function() {
+        var passwordField = $('#password');
+        var passwordIcon = $('#passwordIcon');
+        
+        if (passwordField.attr('type') === 'password') {
+            passwordField.attr('type', 'text');
+            passwordIcon.removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            passwordField.attr('type', 'password');
+            passwordIcon.removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
+    
+    // 自动聚焦邮箱输入框
+    $('#email').focus();
+    
+    // 表单验证
+    $('form').on('submit', function(e) {
+        var email = $('#email').val();
+        var password = $('#password').val();
+        
+        if (!email || !password) {
+            e.preventDefault();
+            alert('请填写完整的登录信息');
+            return false;
+        }
+        
+        // 显示加载状态
+        var submitBtn = $('input[type="submit"]');
+        submitBtn.val('登录中...').prop('disabled', true);
+    });
+});
+</script>
+{% endblock %} 

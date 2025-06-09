@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- 步骤指示器 -->
+    <div class="step-indicator">
+        <div class="step completed">
+            <div class="step-number">1</div>
+            <span>注册账户</span>
+        </div>
+        <div class="step active">
+            <div class="step-number">2</div>
+            <span>身份验证</span>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <span>开始交易</span>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg">
+                <div class="card-header text-center">
+                    <h4 class="text-primary-custom mb-0">
+                        <i class="fas fa-id-card me-2"></i>身份验证
+                    </h4>
+                    <p class="text-muted mb-0">请上传您的身份证件以完成验证</p>
+                </div>
+                
+                <div class="card-body">
+                    <!-- 验证提示 -->
+                    <div class="verification-tips">
+                        <h6 class="text-primary-custom mb-3">
+                            <i class="fas fa-info-circle me-2"></i>验证要求
+                        </h6>
+                        <div class="tip-item">
+                            <i class="fas fa-check"></i>
+                            <span>请确保照片清晰可见，四角完整</span>
+                        </div>
+                        <div class="tip-item">
+                            <i class="fas fa-check"></i>
+                            <span>支持身份证、护照等有效证件</span>
+                        </div>
+                        <div class="tip-item">
+                            <i class="fas fa-check"></i>
+                            <span>文件大小不超过5MB，支持JPG/PNG格式</span>
+                        </div>
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">真实姓名</label>
+                                {{ form.real_name(class="form-control") }}
+                                {% if form.real_name.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.real_name.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">证件号码</label>
+                                {{ form.id_number(class="form-control") }}
+                                {% if form.id_number.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.id_number.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">证件正面</label>
+                                <div class="upload-area" onclick="document.getElementById('id_card_front').click()">
+                                    {{ form.id_card_front(id="id_card_front", style="display: none;") }}
+                                    <i class="fas fa-cloud-upload-alt fa-2x text-primary-custom mb-2"></i>
+                                    <p class="mb-0">点击上传证件正面</p>
+                                    <small class="text-muted">或拖拽文件到此处</small>
+                                    <img id="front_preview" class="upload-preview">
+                                </div>
+                                {% if form.id_card_front.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.id_card_front.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">证件反面</label>
+                                <div class="upload-area" onclick="document.getElementById('id_card_back').click()">
+                                    {{ form.id_card_back(id="id_card_back", style="display: none;") }}
+                                    <i class="fas fa-cloud-upload-alt fa-2x text-primary-custom mb-2"></i>
+                                    <p class="mb-0">点击上传证件反面</p>
+                                    <small class="text-muted">或拖拽文件到此处</small>
+                                    <img id="back_preview" class="upload-preview">
+                                </div>
+                                {% if form.id_card_back.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.id_card_back.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            {{ form.submit(class="btn btn-primary-custom btn-lg") }}
+                            <a href="{{ url_for('main.profile') }}" class="btn btn-outline-secondary">稍后验证</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    margin: 0 15px;
+}
+
+.step-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #404040;
+    color: #888888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.step.active .step-number {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.step.completed .step-number {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.verification-tips {
+    background-color: rgba(255, 149, 0, 0.1);
+    border: 1px solid var(--primary-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.tip-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.tip-item:last-child {
+    margin-bottom: 0;
+}
+
+.tip-item i {
+    color: var(--primary-color);
+    margin-right: 10px;
+    margin-top: 3px;
+}
+
+.upload-area {
+    border: 2px dashed #404040;
+    border-radius: 10px;
+    padding: 40px 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.upload-area:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(255, 149, 0, 0.05);
+}
+
+.upload-area.dragover {
+    border-color: var(--primary-color);
+    background-color: rgba(255, 149, 0, 0.1);
+}
+
+.upload-preview {
+    max-width: 300px;
+    max-height: 200px;
+    border-radius: 8px;
+    margin: 10px auto;
+    display: none;
+}
+</style>
+
+<script>
+// 文件预览功能
+function setupFilePreview(inputId, previewId) {
+    const input = document.getElementById(inputId);
+    const preview = document.getElementById(previewId);
+    
+    input.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
+setupFilePreview('id_card_front', 'front_preview');
+setupFilePreview('id_card_back', 'back_preview');
+</script>
+{% endblock %} 

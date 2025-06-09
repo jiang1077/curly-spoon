@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>身份验证 - CoinBit数字期权交易平台</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* CoinBit交易平台样式 */
+        :root {
+            --primary-color: #FF9500;
+            --secondary-color: #25D366;
+            --bg-dark: #1a1a1a;
+            --bg-card: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --border-color: #404040;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-dark) !important;
+            color: var(--text-primary) !important;
+            line-height: 1.6;
+        }
+
+        .text-primary-custom {
+            color: var(--primary-color) !important;
+        }
+
+        .bg-card {
+            background-color: var(--bg-card) !important;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background-color: #e6860a;
+            border-color: #e6860a;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            background-color: rgba(255, 149, 0, 0.1);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+
+        .form-control {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 8px;
+        }
+
+        .form-control:focus {
+            background-color: var(--bg-card);
+            border-color: var(--primary-color);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 0.2rem rgba(255, 149, 0, 0.25);
+        }
+
+        .form-label {
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(255, 149, 0, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--primary-color);
+            background-color: rgba(255, 149, 0, 0.1);
+        }
+
+        .upload-area input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-preview {
+            max-width: 300px;
+            max-height: 200px;
+            border-radius: 8px;
+            margin: 10px auto;
+            display: none;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 0 15px;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--border-color);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .step.active .step-number {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .verification-tips {
+            background-color: rgba(255, 149, 0, 0.1);
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .tip-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .tip-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .tip-item i {
+            color: var(--primary-color);
+            margin-right: 10px;
+            margin-top: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <!-- 步骤指示器 -->
+        <div class="step-indicator">
+            <div class="step completed">
+                <div class="step-number">1</div>
+                <span>注册账户</span>
+            </div>
+            <div class="step active">
+                <div class="step-number">2</div>
+                <span>身份验证</span>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <span>开始交易</span>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <!-- 主要卡片 -->
+                <div class="card shadow-lg">
+                    <div class="card-header text-center">
+                        <h4><i class="fas fa-id-card me-2 text-primary-custom"></i>身份证件验证</h4>
+                        <p class="text-muted mb-0">请上传您的身份证正反面照片以完成实名认证</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- 验证提示 -->
+                        <div class="verification-tips">
+                            <h6 class="text-primary-custom"><i class="fas fa-exclamation-triangle me-2"></i>重要提示</h6>
+                            <div class="tip-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>请确保证件照片清晰，四角完整，无遮挡</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>支持身份证、护照等有效证件</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>照片格式支持：JPG、PNG格式，最大5MB</span>
+                            </div>
+                        </div>
+
+                        <form id="verificationForm">
+                            <!-- 证件正面上传 -->
+                            <div class="mb-4">
+                                <label class="form-label">上传身份证正面 *</label>
+                                <div class="upload-area" id="frontUpload">
+                                    <input type="file" accept="image/*" id="frontFile">
+                                    <div class="upload-content">
+                                        <i class="fas fa-id-card fa-3x text-primary-custom mb-3"></i>
+                                        <h6>点击上传身份证正面</h6>
+                                        <p class="text-muted mb-0">支持JPG、PNG格式，最大5MB</p>
+                                    </div>
+                                    <img class="upload-preview" id="frontPreview" alt="证件正面预览">
+                                </div>
+                            </div>
+                            
+                            <!-- 证件反面上传 -->
+                            <div class="mb-4">
+                                <label class="form-label">上传身份证反面 *</label>
+                                <div class="upload-area" id="backUpload">
+                                    <input type="file" accept="image/*" id="backFile">
+                                    <div class="upload-content">
+                                        <i class="fas fa-id-card fa-3x text-primary-custom mb-3"></i>
+                                        <h6>点击上传身份证反面</h6>
+                                        <p class="text-muted mb-0">支持JPG、PNG格式，最大5MB</p>
+                                    </div>
+                                    <img class="upload-preview" id="backPreview" alt="证件反面预览">
+                                </div>
+                            </div>
+                            
+                            <!-- 提交按钮 -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                    <i class="fas fa-paper-plane me-2"></i>提交审核
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- 说明卡片 -->
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h6 class="text-primary-custom">
+                            <i class="fas fa-info-circle me-2"></i>审核说明
+                        </h6>
+                        <ul class="text-muted small mb-0">
+                            <li>提交后将由专业团队进行人工审核</li>
+                            <li>审核时间：工作日24小时内完成</li>
+                            <li>审核通过后即可正常使用所有交易功能</li>
+                            <li>如有问题，请联系24小时在线客服</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // 文件上传处理
+            function setupFileUpload(fileInput, uploadArea, preview) {
+                const input = document.getElementById(fileInput);
+                const area = document.getElementById(uploadArea);
+                const previewImg = document.getElementById(preview);
+                
+                // 点击上传
+                area.addEventListener('click', () => {
+                    input.click();
+                });
+                
+                // 文件选择处理
+                input.addEventListener('change', function(e) {
+                    handleFile(e.target.files[0], area, previewImg);
+                });
+                
+                // 拖拽上传
+                area.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    area.classList.add('dragover');
+                });
+                
+                area.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    area.classList.remove('dragover');
+                });
+                
+                area.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    area.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        handleFile(files[0], area, previewImg);
+                        input.files = files;
+                    }
+                });
+            }
+            
+            // 处理文件
+            function handleFile(file, area, previewImg) {
+                if (!file || !file.type.startsWith('image/')) {
+                    alert('请选择有效的图片文件');
+                    return;
+                }
+                
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('文件大小不能超过5MB');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    previewImg.style.display = 'block';
+                    area.querySelector('.upload-content').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            // 设置上传区域
+            setupFileUpload('frontFile', 'frontUpload', 'frontPreview');
+            setupFileUpload('backFile', 'backUpload', 'backPreview');
+            
+            // 表单提交
+            $('#verificationForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                const frontFile = $('#frontFile')[0].files[0];
+                const backFile = $('#backFile')[0].files[0];
+                
+                // 验证表单
+                if (!frontFile) {
+                    alert('请上传身份证正面照片');
+                    return;
+                }
+                
+                if (!backFile) {
+                    alert('请上传身份证反面照片');
+                    return;
+                }
+                
+                // 模拟提交
+                const submitBtn = $('#submitBtn');
+                submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>提交中...');
+                
+                setTimeout(() => {
+                    alert('演示模式：身份证件上传成功！\n\n您的实名认证信息已提交，我们将在24小时内完成审核。\n\n审核完成后将通过邮件通知您。');
+                    
+                    // 跳转到成功页面
+                    showSuccessPage();
+                }, 2000);
+            });
+            
+            // 显示成功页面
+            function showSuccessPage() {
+                $('body').html(`
+                    <div class="container mt-5">
+                        <div class="row justify-content-center">
+                            <div class="col-md-6">
+                                <div class="card shadow-lg text-center">
+                                    <div class="card-body p-5">
+                                        <i class="fas fa-check-circle fa-5x text-success mb-4"></i>
+                                        <h3 class="text-primary-custom mb-3">提交成功！</h3>
+                                        <p class="text-muted mb-4">
+                                            您的身份证件已成功上传，我们将在24小时内完成审核。
+                                            <br>审核结果将通过邮件通知您。
+                                        </p>
+                                        <div class="d-grid gap-2">
+                                            <button class="btn btn-primary" onclick="window.location.href='home_demo.html'">
+                                                <i class="fas fa-home me-2"></i>返回首页
+                                            </button>
+                                            <button class="btn btn-outline-primary" onclick="alert('演示模式：客服功能')">
+                                                <i class="fab fa-whatsapp me-2"></i>联系客服
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoinBit - 管理员登录测试</title>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            background: rgba(42, 42, 42, 0.95);
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid #404040;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #00C851, #007E33);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .login-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #ccc;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            background: #1a1a1a;
+            border: 2px solid #404040;
+            border-radius: 10px;
+            padding: 14px 16px;
+            color: #ffffff;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #00C851;
+            box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #666;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: #00C851;
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ccc;
+        }
+
+        .remember-checkbox {
+            width: 16px;
+            height: 16px;
+            accent-color: #00C851;
+        }
+
+        .forgot-link {
+            color: #00C851;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #00C851, #007E33);
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 16px;
+        }
+
+        .login-btn:hover {
+            background: linear-gradient(135deg, #007E33, #00C851);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 200, 81, 0.3);
+        }
+
+        .login-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-danger {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            color: #ff4444;
+        }
+
+        .alert-success {
+            background: rgba(0, 200, 81, 0.1);
+            border: 1px solid rgba(0, 200, 81, 0.3);
+            color: #00C851;
+        }
+
+        .footer-text {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            margin-top: 24px;
+        }
+
+        .loading {
+            display: none;
+            margin-right: 8px;
+        }
+
+        .loading.show {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 20px;
+                padding: 30px 24px;
+            }
+            
+            .login-title {
+                font-size: 20px;
+            }
+        }
+
+        /* 安全性指示 */
+        .security-info {
+            background: rgba(0, 123, 255, 0.1);
+            border: 1px solid rgba(0, 123, 255, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #007bff;
+            text-align: center;
+        }
+
+        .test-info {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #ffc107;
+        }
+
+        .test-info h4 {
+            margin-bottom: 8px;
+            color: #ffc107;
+        }
+
+        .test-credentials {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 12px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="test-info">
+            <h4><i class="fas fa-flask"></i> 测试模式</h4>
+            <p>这是管理员登录页面的静态测试版本</p>
+            <div class="test-credentials">
+                <strong>测试账号：</strong><br>
+                用户名: admin<br>
+                密码: admin123
+            </div>
+        </div>
+
+        <div class="login-header">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h1 class="login-title">CoinBit 管理后台</h1>
+            <p class="login-subtitle">数字期权交易平台管理系统</p>
+        </div>
+
+        <!-- 消息提示区域 -->
+        <div id="messageArea"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-user me-2"></i>管理员账号
+                </label>
+                <input type="text" name="username" class="form-input" 
+                       placeholder="请输入管理员用户名" id="usernameInput" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-lock me-2"></i>登录密码
+                </label>
+                <div class="password-container">
+                    <input type="password" name="password" class="form-input" 
+                           placeholder="请输入登录密码" id="passwordInput" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword()">
+                        <i class="fas fa-eye" id="passwordIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="remember-forgot">
+                <label class="remember-me">
+                    <input type="checkbox" class="remember-checkbox" name="remember">
+                    <span>记住登录状态</span>
+                </label>
+                <a class="forgot-link" onclick="showForgotPassword()">忘记密码？</a>
+            </div>
+
+            <button type="submit" class="login-btn" id="loginButton">
+                <i class="fas fa-spinner loading" id="loadingIcon"></i>
+                <i class="fas fa-sign-in-alt me-2"></i>
+                <span id="buttonText">安全登录</span>
+            </button>
+        </form>
+
+        <div class="security-info">
+            <i class="fas fa-shield-alt me-2"></i>
+            管理员登录受到多重安全保护，登录信息将被加密传输
+        </div>
+
+        <div class="footer-text">
+            CoinBit © 2024 - Professional Trading Platform
+        </div>
+    </div>
+
+    <script>
+        // 密码显示/隐藏切换
+        function togglePassword() {
+            const passwordInput = document.getElementById('passwordInput');
+            const passwordIcon = document.getElementById('passwordIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordIcon.className = 'fas fa-eye-slash';
+            } else {
+                passwordInput.type = 'password';
+                passwordIcon.className = 'fas fa-eye';
+            }
+        }
+
+        // 忘记密码
+        function showForgotPassword() {
+            alert('忘记密码功能\n\n请联系系统超级管理员重置密码，\n或通过以下方式找回：\n\n1. 通过注册邮箱重置\n2. 联系技术支持\n3. 使用备用管理员账号');
+        }
+
+        // 显示消息
+        function showMessage(message, type) {
+            const messageArea = document.getElementById('messageArea');
+            messageArea.innerHTML = `
+                <div class="alert alert-${type}">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+                    ${message}
+                </div>
+            `;
+            
+            // 3秒后清除消息
+            setTimeout(() => {
+                messageArea.innerHTML = '';
+            }, 3000);
+        }
+
+        // 表单提交处理
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const button = document.getElementById('loginButton');
+            const buttonText = document.getElementById('buttonText');
+            const loadingIcon = document.getElementById('loadingIcon');
+            const username = document.getElementById('usernameInput').value;
+            const password = document.getElementById('passwordInput').value;
+            
+            // 显示加载状态
+            button.disabled = true;
+            buttonText.textContent = '登录中...';
+            loadingIcon.classList.add('show');
+            
+            // 模拟登录验证
+            setTimeout(() => {
+                button.disabled = false;
+                buttonText.textContent = '安全登录';
+                loadingIcon.classList.remove('show');
+                
+                if (username === 'admin' && password === 'admin123') {
+                    showMessage('登录成功！正在跳转到管理仪表板...', 'success');
+                    
+                    // 2秒后跳转到仪表板测试页面
+                    setTimeout(() => {
+                        window.location.href = 'admin_dashboard_test.html';
+                    }, 2000);
+                } else {
+                    showMessage('用户名或密码错误', 'danger');
+                }
+            }, 1500);
+        });
+
+        // 自动填充测试账号（方便测试）
+        function fillTestCredentials() {
+            document.getElementById('usernameInput').value = 'admin';
+            document.getElementById('passwordInput').value = 'admin123';
+        }
+
+        // 键盘快捷键
+        document.addEventListener('keydown', function(e) {
+            // Ctrl + Enter 快速登录
+            if (e.ctrlKey && e.key === 'Enter') {
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+            
+            // Ctrl + T 填充测试账号
+            if (e.ctrlKey && e.key === 't') {
+                e.preventDefault();
+                fillTestCredentials();
+            }
+        });
+
+        // 页面加载完成后聚焦到用户名输入框
+        window.addEventListener('load', function() {
+            document.getElementById('usernameInput').focus();
+            
+            // 显示快捷键提示
+            setTimeout(() => {
+                const hint = document.createElement('div');
+                hint.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: rgba(0, 200, 81, 0.1);
+                    border: 1px solid rgba(0, 200, 81, 0.3);
+                    color: #00C851;
+                    padding: 12px;
+                    border-radius: 8px;
+                    font-size: 12px;
+                    z-index: 1000;
+                    animation: fadeIn 0.5s ease;
+                `;
+                hint.innerHTML = `
+                    <strong>快捷键提示：</strong><br>
+                    Ctrl + T: 填充测试账号<br>
+                    Ctrl + Enter: 快速登录
+                `;
+                document.body.appendChild(hint);
+                
+                // 5秒后自动隐藏
+                setTimeout(() => {
+                    hint.style.animation = 'fadeOut 0.5s ease';
+                    setTimeout(() => hint.remove(), 500);
+                }, 5000);
+                
+                // 添加CSS动画
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+                    @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-10px); } }
+                `;
+                document.head.appendChild(style);
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 

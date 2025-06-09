@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoinBit - 数字期权交易平台</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* CoinBit交易平台样式 */
+        :root {
+            --primary-color: #FF9500;
+            --secondary-color: #25D366;
+            --bg-dark: #1a1a1a;
+            --bg-card: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --success-color: #4CAF50;
+            --danger-color: #F44336;
+            --warning-color: #FF9800;
+            --info-color: #2196F3;
+            --border-color: #404040;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-dark) !important;
+            color: var(--text-primary) !important;
+            line-height: 1.6;
+            padding-bottom: 20px;
+        }
+
+        .text-primary-custom {
+            color: var(--primary-color) !important;
+        }
+
+        .bg-card {
+            background-color: var(--bg-card) !important;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background-color: #e6860a;
+            border-color: #e6860a;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-header {
+            background-color: rgba(255, 149, 0, 0.1);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .navbar-nav .nav-link {
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .crypto-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .crypto-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 149, 0, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        .crypto-symbol {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .crypto-name {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+
+        .crypto-change {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .price-display-large {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .price-display-small {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .bg-gradient {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #cc7700 100%);
+        }
+
+        .bg-primary-custom {
+            background-color: var(--primary-color) !important;
+        }
+
+        /* 欢迎区域样式优化 */
+        .welcome-section {
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .welcome-content {
+            text-align: center;
+            padding: 60px 30px;
+        }
+
+        .welcome-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .welcome-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .btn-group-welcome {
+            gap: 15px;
+        }
+
+        .btn-welcome {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            min-width: 150px;
+        }
+
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 2.5rem;
+            }
+            
+            .welcome-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .btn-welcome {
+                padding: 12px 25px;
+                font-size: 1rem;
+                min-width: 130px;
+            }
+            
+            .btn-group-welcome {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .price-display-large {
+                font-size: 1.4rem;
+            }
+            
+            .price-display-small {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <!-- 品牌logo -->
+            <a class="navbar-brand text-primary-custom fw-bold" href="#">
+                <i class="fas fa-coins me-2"></i>CoinBit
+            </a>
+            
+            <!-- 移动端菜单按钮 -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- 导航菜单 -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- 右侧菜单 -->
+                <ul class="navbar-nav ms-auto">
+                    <!-- 语言选择器 -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-globe me-1"></i>中文
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end bg-card">
+                            <li><a class="dropdown-item active" href="#">中文</a></li>
+                            <li><a class="dropdown-item" href="#">English</a></li>
+                            <li><a class="dropdown-item" href="#">日本語</a></li>
+                            <li><a class="dropdown-item" href="#">한국어</a></li>
+                            <li><a class="dropdown-item" href="#">Español</a></li>
+                            <li><a class="dropdown-item" href="#">Français</a></li>
+                            <li><a class="dropdown-item" href="#">Deutsch</a></li>
+                            <li><a class="dropdown-item" href="#">Русский</a></li>
+                            <li><a class="dropdown-item" href="#">Português</a></li>
+                            <li><a class="dropdown-item" href="#">Italiano</a></li>
+                            <li><a class="dropdown-item" href="#">Nederlands</a></li>
+                            <li><a class="dropdown-item" href="#">Türkçe</a></li>
+                            <li><a class="dropdown-item" href="#">العربية</a></li>
+                            <li><a class="dropdown-item" href="#">हिन्दी</a></li>
+                        </ul>
+                    </li>
+                    
+                    <!-- 登录/注册按钮 -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#login">
+                            <i class="fas fa-sign-in-alt me-1"></i>登录
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary text-white ms-2 px-3" href="#register">
+                            注册
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 主要内容区域 -->
+    <main style="margin-top: 76px;">
+        
+        <!-- 欢迎区域 -->
+        <section class="welcome-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card bg-gradient">
+                            <div class="welcome-content">
+                                <h1 class="welcome-title">
+                                    <i class="fas fa-coins me-3"></i>CoinBit
+                                </h1>
+                                <p class="welcome-subtitle">专业的数字期权交易平台 - 简洁、流畅、稳定</p>
+                                <div class="d-flex justify-content-center btn-group-welcome">
+                                    <a href="#register" class="btn btn-light btn-welcome">
+                                        <i class="fas fa-user-plus me-2"></i>立即注册
+                                    </a>
+                                    <a href="#login" class="btn btn-outline-light btn-welcome">
+                                        <i class="fas fa-sign-in-alt me-2"></i>用户登录
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 实时价格展示 -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row mb-4">
+                    <div class="col-12 text-center">
+                        <h2 class="text-primary-custom mb-2">
+                            <i class="fas fa-chart-line me-2"></i>实时行情
+                        </h2>
+                        <p class="text-muted">主流加密货币及黄金实时价格</p>
+                    </div>
+                </div>
+                
+                <div class="row" id="priceContainer">
+                    <!-- BTC -->
+                    <div class="col-6 col-md-4 col-lg-2 mb-4">
+                        <div class="crypto-card">
+                            <div class="crypto-symbol">BTC</div>
+                            <div class="crypto-name">比特币</div>
+                            <div class="price-display-small" data-symbol="BTC/USDT">
+                                $96,130.23
+                            </div>
+                            <div class="crypto-change text-success">
+                                <i class="fas fa-arrow-up me-1"></i>
+                                +2.45%
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ETH -->
+                    <div class="col-6 col-md-4 col-lg-2 mb-4">
+                        <div class="crypto-card">
+                            <div class="crypto-symbol">ETH</div>
+                            <div class="crypto-name">以太坊</div>
+                            <div class="price-display-small">
+                                $3,420.15
+                            </div>
+                            <div class="crypto-change text-danger">
+                                <i class="fas fa-arrow-down me-1"></i>
+                                -1.23%
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- LTC -->
+                    <div class="col-6 col-md-4 col-lg-2 mb-4">
+                        <div class="crypto-card">
+                            <div class="crypto-symbol">LTC</div>
+                            <div class="crypto-name">莱特币</div>
+                            <div class="price-display-small">
+                                $85.67
+                            </div>
+                            <div class="crypto-change text-success">
+                                <i class="fas fa-arrow-up me-1"></i>
+                                +0.89%
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- XRP -->
+                    <div class="col-6 col-md-4 col-lg-2 mb-4">
+                        <div class="crypto-card">
+                            <div class="crypto-symbol">XRP</div>
+                            <div class="crypto-name">瑞波币</div>
+                            <div class="price-display-small">
+                                $0.5234
+                            </div>
+                            <div class="crypto-change text-success">
+                                <i class="fas fa-arrow-up me-1"></i>
+                                +3.12%
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- GOLD -->
+                    <div class="col-6 col-md-4 col-lg-2 mb-4">
+                        <div class="crypto-card">
+                            <div class="crypto-symbol">GOLD</div>
+                            <div class="crypto-name">黄金</div>
+                            <div class="price-display-small">
+                                $2,035.50
+                            </div>
+                            <div class="crypto-change text-danger">
+                                <i class="fas fa-arrow-down me-1"></i>
+                                -0.45%
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 价格更新状态 -->
+                    <div class="col-12 text-center mt-3">
+                        <small class="text-muted" id="lastUpdate">
+                            <i class="fas fa-sync-alt me-1"></i>实时更新中...
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script>
+        // 模拟价格更新
+        function updatePrices() {
+            const symbols = ['BTC/USDT', 'ETH/USDT', 'LTC/USDT', 'XRP/USDT', 'GOLD/USDT'];
+            const basePrices = {
+                'BTC/USDT': 96130.23,
+                'ETH/USDT': 3420.15,
+                'LTC/USDT': 85.67,
+                'XRP/USDT': 0.5234,
+                'GOLD/USDT': 2035.50
+            };
+            
+            symbols.forEach(symbol => {
+                const element = document.querySelector('[data-symbol="' + symbol + '"]');
+                if (element) {
+                    const basePrice = basePrices[symbol];
+                    const randomChange = (Math.random() - 0.5) * 20;
+                    const newPrice = basePrice + randomChange;
+                    
+                    if (symbol === 'XRP/USDT') {
+                        element.textContent = '$' + newPrice.toFixed(4);
+                    } else {
+                        element.textContent = '$' + newPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    }
+                    
+                    // 更新涨跌幅（随机变化）
+                    const changeElement = element.nextElementSibling;
+                    if (changeElement && changeElement.classList.contains('crypto-change')) {
+                        const randomChangePercent = (Math.random() - 0.5) * 10;
+                        const changeText = (randomChangePercent >= 0 ? '+' : '') + randomChangePercent.toFixed(2) + '%';
+                        const arrow = randomChangePercent >= 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+                        const colorClass = randomChangePercent >= 0 ? 'text-success' : 'text-danger';
+                        
+                        changeElement.className = `crypto-change ${colorClass}`;
+                        changeElement.innerHTML = `<i class="fas ${arrow} me-1"></i>${changeText}`;
+                    }
+                }
+            });
+            
+            document.getElementById('lastUpdate').innerHTML = '<i class="fas fa-sync-alt me-1"></i>刚刚更新';
+        }
+        
+        // 页面加载完成后设置定时器
+        $(document).ready(function() {
+            // 每10秒更新一次价格
+            setInterval(updatePrices, 10000);
+            
+            // 立即更新一次
+            updatePrices();
+            
+            // 登录注册按钮点击事件
+            $('a[href="#login"]').click(function(e) {
+                e.preventDefault();
+                alert('演示模式：这里将跳转到登录页面');
+            });
+            
+            $('a[href="#register"]').click(function(e) {
+                e.preventDefault();
+                alert('演示模式：这里将跳转到注册页面\n\n实际注册流程：\n1. 填写邮箱和密码\n2. 上传身份证正反面\n3. 等待管理员审核\n4. 审核通过后开始交易');
+            });
+        });
+    </script>
+</body>
+</html> 

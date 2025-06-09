@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoinBit - 充值地址管理</title>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        /* 顶部导航栏 */
+        .navbar {
+            background: rgba(42, 42, 42, 0.95);
+            border-bottom: 1px solid #404040;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #00C851;
+            cursor: pointer;
+        }
+
+        .navbar-brand i {
+            font-size: 24px;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ccc;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #00C851, #007E33);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            color: #ff4444;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 68, 68, 0.2);
+        }
+
+        /* 主要内容 */
+        .main-content {
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: #888;
+            font-size: 16px;
+        }
+
+        /* 测试模式提示 */
+        .test-mode-banner {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            color: #ffc107;
+            font-size: 14px;
+        }
+
+        /* 工具栏 */
+        .toolbar {
+            background: rgba(42, 42, 42, 0.8);
+            border: 1px solid #404040;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .search-input {
+            background: #1a1a1a;
+            border: 2px solid #404040;
+            border-radius: 8px;
+            padding: 10px 16px;
+            color: #ffffff;
+            font-size: 14px;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #00C851;
+            box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.1);
+        }
+
+        .filter-select {
+            background: #1a1a1a;
+            border: 2px solid #404040;
+            border-radius: 8px;
+            padding: 10px 16px;
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00C851, #007E33);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #007E33, #00C851);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 200, 81, 0.3);
+        }
+
+        .btn-danger {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            color: #ff4444;
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 68, 68, 0.2);
+        }
+
+        .btn-warning {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            color: #ffc107;
+        }
+
+        .btn-warning:hover {
+            background: rgba(255, 193, 7, 0.2);
+        }
+
+        /* 地址卡片网格 */
+        .address-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .address-card {
+            background: rgba(42, 42, 42, 0.8);
+            border: 1px solid #404040;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .address-card:hover {
+            border-color: #00C851;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 200, 81, 0.1);
+        }
+
+        .address-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .crypto-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .crypto-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .crypto-icon.btc { background: linear-gradient(135deg, #f7931a, #ff6b1a); }
+        .crypto-icon.eth { background: linear-gradient(135deg, #627eea, #3c5aa6); }
+        .crypto-icon.usdt { background: linear-gradient(135deg, #26a17b, #1f8a63); }
+        .crypto-icon.bnb { background: linear-gradient(135deg, #f3ba2f, #e8a628); }
+        .crypto-icon.ada { background: linear-gradient(135deg, #0033ad, #002884); }
+        .crypto-icon.dot { background: linear-gradient(135deg, #e6007a, #c5006b); }
+
+        .crypto-details {
+            flex: 1;
+        }
+
+        .crypto-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .crypto-symbol {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .address-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: rgba(0, 200, 81, 0.1);
+            color: #00C851;
+        }
+
+        .status-inactive {
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+        }
+
+        .status-maintenance {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .address-content {
+            margin-bottom: 20px;
+        }
+
+        .address-field {
+            margin-bottom: 16px;
+        }
+
+        .field-label {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .field-value {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            word-break: break-all;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .field-value:hover {
+            border-color: #00C851;
+            background: rgba(0, 200, 81, 0.05);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 200, 81, 0.1);
+            border: 1px solid rgba(0, 200, 81, 0.3);
+            color: #00C851;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(0, 200, 81, 0.2);
+        }
+
+        .address-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .action-btn.edit {
+            background: rgba(0, 123, 255, 0.1);
+            color: #007bff;
+        }
+
+        .action-btn.edit:hover {
+            background: rgba(0, 123, 255, 0.2);
+        }
+
+        .action-btn.toggle {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .action-btn.toggle:hover {
+            background: rgba(255, 193, 7, 0.2);
+        }
+
+        .action-btn.delete {
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+        }
+
+        .action-btn.delete:hover {
+            background: rgba(255, 68, 68, 0.2);
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(42, 42, 42, 0.95);
+            border: 1px solid #404040;
+            border-radius: 12px;
+            padding: 24px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #404040;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: #ff4444;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #ccc;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            background: #1a1a1a;
+            border: 2px solid #404040;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #ffffff;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #00C851;
+            box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+        }
+
+        .form-select {
+            width: 100%;
+            background: #1a1a1a;
+            border: 2px solid #404040;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        /* 警告框 */
+        .warning-box {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            color: #ffc107;
+            font-size: 14px;
+        }
+
+        .warning-box i {
+            margin-right: 8px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 16px;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .address-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+
+            .search-filters {
+                flex-direction: column;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* 复制成功提示 */
+        .copy-toast {
+            position: fixed;
+            top: 80px;
+            right: 24px;
+            background: rgba(0, 200, 81, 0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1001;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .copy-toast.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+        <div class="navbar-brand" onclick="goToDashboard()">
+            <i class="fas fa-chart-line"></i>
+            CoinBit 管理后台
+        </div>
+        <div class="navbar-user">
+            <div class="user-info">
+                <div class="user-avatar">A</div>
+                <span>管理员</span>
+            </div>
+            <div class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                退出
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <div class="main-content">
+        <!-- 测试模式提示 -->
+        <div class="test-mode-banner">
+            <i class="fas fa-flask"></i> <strong>测试模式</strong> - 充值地址管理页面静态演示版本，支持增删改查操作
+        </div>
+
+        <!-- 页面标题 -->
+        <div class="page-header">
+            <h1 class="page-title">充值地址管理</h1>
+            <p class="page-subtitle">管理各种加密货币的充值钱包地址，确保用户充值安全</p>
+        </div>
+
+        <!-- 工具栏 -->
+        <div class="toolbar">
+            <div class="search-filters">
+                <input type="text" class="search-input" placeholder="搜索币种名称或地址..." id="searchInput">
+                <select class="filter-select" id="statusFilter">
+                    <option value="">全部状态</option>
+                    <option value="active">启用中</option>
+                    <option value="inactive">已禁用</option>
+                    <option value="maintenance">维护中</option>
+                </select>
+                <select class="filter-select" id="cryptoFilter">
+                    <option value="">全部币种</option>
+                    <option value="BTC">比特币 (BTC)</option>
+                    <option value="ETH">以太坊 (ETH)</option>
+                    <option value="USDT">泰达币 (USDT)</option>
+                    <option value="BNB">币安币 (BNB)</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="showAddAddressModal()">
+                <i class="fas fa-plus"></i>
+                添加充值地址
+            </button>
+        </div>
+
+        <!-- 充值地址网格 -->
+        <div class="address-grid" id="addressGrid">
+            <!-- 地址卡片将由JavaScript动态生成 -->
+        </div>
+
+        <!-- 空状态 -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <i class="fas fa-wallet"></i>
+            <h3>暂无充值地址</h3>
+            <p>还没有配置任何充值地址，点击上方按钮添加</p>
+            <button class="btn btn-primary" onclick="showAddAddressModal()">
+                <i class="fas fa-plus"></i>
+                添加第一个地址
+            </button>
+        </div>
+    </div>
+
+    <!-- 添加/编辑地址模态框 -->
+    <div class="modal" id="addressModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">添加充值地址</h3>
+                <button class="modal-close" onclick="closeAddressModal()">&times;</button>
+            </div>
+            
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>重要提醒：</strong>请确保充值地址准确无误，错误的地址可能导致资金损失！
+            </div>
+            
+            <form id="addressForm">
+                <input type="hidden" id="addressId">
+                
+                <div class="form-group">
+                    <label class="form-label">加密货币</label>
+                    <select class="form-select" id="cryptoType" required>
+                        <option value="">请选择币种</option>
+                        <option value="BTC">比特币 (BTC)</option>
+                        <option value="ETH">以太坊 (ETH)</option>
+                        <option value="USDT">泰达币 (USDT)</option>
+                        <option value="BNB">币安币 (BNB)</option>
+                        <option value="ADA">艾达币 (ADA)</option>
+                        <option value="DOT">波卡币 (DOT)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">钱包地址</label>
+                    <textarea class="form-input form-textarea" id="walletAddress" required 
+                              placeholder="请输入完整的钱包地址"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">地址标签 (可选)</label>
+                    <input type="text" class="form-input" id="addressLabel" 
+                           placeholder="例如：主钱包、冷钱包等">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">网络类型</label>
+                    <select class="form-select" id="networkType" required>
+                        <option value="">请选择网络</option>
+                        <option value="mainnet">主网</option>
+                        <option value="testnet">测试网</option>
+                        <option value="erc20">ERC-20</option>
+                        <option value="bep20">BEP-20</option>
+                        <option value="trc20">TRC-20</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">最小充值金额</label>
+                    <input type="number" class="form-input" id="minAmount" step="0.00000001" 
+                           placeholder="0.001" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">手续费</label>
+                    <input type="number" class="form-input" id="feeAmount" step="0.00000001" 
+                           placeholder="0.0005">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">状态</label>
+                    <select class="form-select" id="addressStatus" required>
+                        <option value="active">启用中</option>
+                        <option value="inactive">已禁用</option>
+                        <option value="maintenance">维护中</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">备注说明</label>
+                    <textarea class="form-input form-textarea" id="description" 
+                              placeholder="地址用途说明、注意事项等"></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-danger" onclick="closeAddressModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        保存地址
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 复制成功提示 -->
+    <div class="copy-toast" id="copyToast">
+        <i class="fas fa-check"></i>
+        地址已复制到剪贴板
+    </div>
+
+    <script>
+        // 模拟充值地址数据
+        let addressesData = [
+            {
+                id: 1,
+                cryptoType: 'BTC',
+                cryptoName: '比特币',
+                walletAddress: '1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2',
+                addressLabel: '主钱包',
+                networkType: 'mainnet',
+                minAmount: 0.001,
+                feeAmount: 0.0005,
+                status: 'active',
+                description: '比特币主网收款地址',
+                createdAt: '2024-12-20 10:30',
+                lastUsed: '2024-12-24 15:22'
+            },
+            {
+                id: 2,
+                cryptoType: 'ETH',
+                cryptoName: '以太坊',
+                walletAddress: '0x742d35Cc6634C0532925a3b8D34d8cC8b6e35b3d',
+                addressLabel: '以太坊钱包',
+                networkType: 'mainnet',
+                minAmount: 0.01,
+                feeAmount: 0.005,
+                status: 'active',
+                description: '以太坊主网收款地址',
+                createdAt: '2024-12-18 14:15',
+                lastUsed: '2024-12-24 12:45'
+            },
+            {
+                id: 3,
+                cryptoType: 'USDT',
+                cryptoName: '泰达币',
+                walletAddress: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
+                addressLabel: 'USDT钱包',
+                networkType: 'trc20',
+                minAmount: 10,
+                feeAmount: 1,
+                status: 'active',
+                description: 'USDT TRC-20 收款地址',
+                createdAt: '2024-12-19 09:20',
+                lastUsed: '2024-12-24 16:10'
+            },
+            {
+                id: 4,
+                cryptoType: 'BNB',
+                cryptoName: '币安币',
+                walletAddress: 'bnb1grpf0955h0ykzq3ar5nmum7y6gdfl6lxfn46h2',
+                addressLabel: 'BNB钱包',
+                networkType: 'bep20',
+                minAmount: 0.1,
+                feeAmount: 0.001,
+                status: 'maintenance',
+                description: 'BNB BEP-20 收款地址（维护中）',
+                createdAt: '2024-12-21 16:30',
+                lastUsed: '2024-12-23 11:20'
+            },
+            {
+                id: 5,
+                cryptoType: 'ADA',
+                cryptoName: '艾达币',
+                walletAddress: 'addr1qy6chkq8vs7w8suu4pk6q3qt5jckdtx5fwq4j5xlsmc4c5tcxhsslm6kf7lqd8nt5tr4a',
+                addressLabel: 'ADA钱包',
+                networkType: 'mainnet',
+                minAmount: 5,
+                feeAmount: 0.17,
+                status: 'inactive',
+                description: 'Cardano 收款地址（已禁用）',
+                createdAt: '2024-12-15 12:45',
+                lastUsed: '2024-12-20 09:30'
+            },
+            {
+                id: 6,
+                cryptoType: 'DOT',
+                cryptoName: '波卡币',
+                walletAddress: '15oF4uVJwmo4TdGW7VfQxNLavjCXviqxT9S1MgbjMNHr6Sp5',
+                addressLabel: 'DOT钱包',
+                networkType: 'mainnet',
+                minAmount: 1,
+                feeAmount: 0.01,
+                status: 'active',
+                description: 'Polkadot 收款地址',
+                createdAt: '2024-12-22 08:15',
+                lastUsed: '2024-12-24 14:35'
+            }
+        ];
+
+        let filteredAddresses = [...addressesData];
+
+        // 初始化页面
+        window.addEventListener('load', function() {
+            renderAddressGrid();
+            setupEventListeners();
+        });
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 搜索输入
+            document.getElementById('searchInput').addEventListener('input', debounce(filterAddresses, 300));
+            
+            // 状态筛选
+            document.getElementById('statusFilter').addEventListener('change', filterAddresses);
+            
+            // 币种筛选
+            document.getElementById('cryptoFilter').addEventListener('change', filterAddresses);
+            
+            // 地址表单提交
+            document.getElementById('addressForm').addEventListener('submit', handleAddressSubmit);
+        }
+
+        // 防抖函数
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // 渲染地址网格
+        function renderAddressGrid() {
+            const addressGrid = document.getElementById('addressGrid');
+            const emptyState = document.getElementById('emptyState');
+
+            if (filteredAddresses.length === 0) {
+                addressGrid.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            
+            addressGrid.innerHTML = filteredAddresses.map(address => `
+                <div class="address-card">
+                    <div class="address-header">
+                        <div class="crypto-info">
+                            <div class="crypto-icon ${address.cryptoType.toLowerCase()}">
+                                ${address.cryptoType}
+                            </div>
+                            <div class="crypto-details">
+                                <div class="crypto-name">${address.cryptoName}</div>
+                                <div class="crypto-symbol">${address.cryptoType}</div>
+                            </div>
+                        </div>
+                        <span class="address-status status-${address.status}">
+                            ${getStatusText(address.status)}
+                        </span>
+                    </div>
+                    
+                    <div class="address-content">
+                        <div class="address-field">
+                            <div class="field-label">钱包地址</div>
+                            <div class="field-value" onclick="copyToClipboard('${address.walletAddress}')">
+                                ${address.walletAddress}
+                                <span class="copy-btn">复制</span>
+                            </div>
+                        </div>
+                        
+                        ${address.addressLabel ? `
+                            <div class="address-field">
+                                <div class="field-label">地址标签</div>
+                                <div class="field-value">${address.addressLabel}</div>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="address-field">
+                            <div class="field-label">网络类型</div>
+                            <div class="field-value">${address.networkType.toUpperCase()}</div>
+                        </div>
+                        
+                        <div class="address-field">
+                            <div class="field-label">最小充值 / 手续费</div>
+                            <div class="field-value">${address.minAmount} ${address.cryptoType} / ${address.feeAmount} ${address.cryptoType}</div>
+                        </div>
+                        
+                        <div class="address-field">
+                            <div class="field-label">最后使用时间</div>
+                            <div class="field-value">${address.lastUsed}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="address-actions">
+                        <button class="action-btn edit" onclick="editAddress(${address.id})" title="编辑">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn toggle" onclick="toggleAddress(${address.id})" title="切换状态">
+                            <i class="fas fa-${address.status === 'active' ? 'pause' : 'play'}"></i>
+                        </button>
+                        <button class="action-btn delete" onclick="deleteAddress(${address.id})" title="删除">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 获取状态文本
+        function getStatusText(status) {
+            const statusMap = {
+                'active': '启用中',
+                'inactive': '已禁用',
+                'maintenance': '维护中'
+            };
+            return statusMap[status] || status;
+        }
+
+        // 筛选地址
+        function filterAddresses() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const cryptoFilter = document.getElementById('cryptoFilter').value;
+
+            filteredAddresses = addressesData.filter(address => {
+                // 搜索筛选
+                const matchesSearch = !searchTerm || 
+                    address.cryptoName.toLowerCase().includes(searchTerm) ||
+                    address.cryptoType.toLowerCase().includes(searchTerm) ||
+                    address.walletAddress.toLowerCase().includes(searchTerm) ||
+                    (address.addressLabel && address.addressLabel.toLowerCase().includes(searchTerm));
+
+                // 状态筛选
+                const matchesStatus = !statusFilter || address.status === statusFilter;
+
+                // 币种筛选
+                const matchesCrypto = !cryptoFilter || address.cryptoType === cryptoFilter;
+
+                return matchesSearch && matchesStatus && matchesCrypto;
+            });
+
+            renderAddressGrid();
+        }
+
+        // 显示添加地址模态框
+        function showAddAddressModal() {
+            document.getElementById('modalTitle').textContent = '添加充值地址';
+            document.getElementById('addressForm').reset();
+            document.getElementById('addressId').value = '';
+            document.getElementById('addressModal').classList.add('show');
+        }
+
+        // 编辑地址
+        function editAddress(addressId) {
+            const address = addressesData.find(a => a.id === addressId);
+            if (!address) return;
+
+            document.getElementById('modalTitle').textContent = '编辑充值地址';
+            document.getElementById('addressId').value = address.id;
+            document.getElementById('cryptoType').value = address.cryptoType;
+            document.getElementById('walletAddress').value = address.walletAddress;
+            document.getElementById('addressLabel').value = address.addressLabel || '';
+            document.getElementById('networkType').value = address.networkType;
+            document.getElementById('minAmount').value = address.minAmount;
+            document.getElementById('feeAmount').value = address.feeAmount;
+            document.getElementById('addressStatus').value = address.status;
+            document.getElementById('description').value = address.description || '';
+            
+            document.getElementById('addressModal').classList.add('show');
+        }
+
+        // 关闭地址模态框
+        function closeAddressModal() {
+            document.getElementById('addressModal').classList.remove('show');
+        }
+
+        // 处理地址表单提交
+        function handleAddressSubmit(e) {
+            e.preventDefault();
+            
+            const addressId = document.getElementById('addressId').value;
+            const addressData = {
+                cryptoType: document.getElementById('cryptoType').value,
+                cryptoName: getCryptoName(document.getElementById('cryptoType').value),
+                walletAddress: document.getElementById('walletAddress').value,
+                addressLabel: document.getElementById('addressLabel').value,
+                networkType: document.getElementById('networkType').value,
+                minAmount: parseFloat(document.getElementById('minAmount').value),
+                feeAmount: parseFloat(document.getElementById('feeAmount').value) || 0,
+                status: document.getElementById('addressStatus').value,
+                description: document.getElementById('description').value
+            };
+
+            if (addressId) {
+                // 编辑地址
+                const addressIndex = addressesData.findIndex(a => a.id === parseInt(addressId));
+                if (addressIndex !== -1) {
+                    addressesData[addressIndex] = { 
+                        ...addressesData[addressIndex], 
+                        ...addressData,
+                        lastUsed: new Date().toLocaleString('zh-CN')
+                    };
+                    alert('充值地址更新成功！');
+                }
+            } else {
+                // 添加新地址
+                const newAddress = {
+                    id: Math.max(...addressesData.map(a => a.id)) + 1,
+                    ...addressData,
+                    createdAt: new Date().toLocaleString('zh-CN'),
+                    lastUsed: '尚未使用'
+                };
+                addressesData.push(newAddress);
+                alert('充值地址添加成功！');
+            }
+
+            closeAddressModal();
+            filterAddresses();
+        }
+
+        // 获取币种名称
+        function getCryptoName(cryptoType) {
+            const cryptoNames = {
+                'BTC': '比特币',
+                'ETH': '以太坊',
+                'USDT': '泰达币',
+                'BNB': '币安币',
+                'ADA': '艾达币',
+                'DOT': '波卡币'
+            };
+            return cryptoNames[cryptoType] || cryptoType;
+        }
+
+        // 切换地址状态
+        function toggleAddress(addressId) {
+            const address = addressesData.find(a => a.id === addressId);
+            if (!address) return;
+
+            const newStatus = address.status === 'active' ? 'inactive' : 'active';
+            const statusText = newStatus === 'active' ? '启用' : '禁用';
+            
+            if (confirm(`确认${statusText}该充值地址？`)) {
+                address.status = newStatus;
+                alert(`充值地址已${statusText}！`);
+                filterAddresses();
+            }
+        }
+
+        // 删除地址
+        function deleteAddress(addressId) {
+            if (confirm('确认删除该充值地址？此操作不可恢复！\n\n注意：删除后用户将无法使用此地址充值！')) {
+                const addressIndex = addressesData.findIndex(a => a.id === addressId);
+                if (addressIndex !== -1) {
+                    addressesData.splice(addressIndex, 1);
+                    alert('充值地址删除成功！');
+                    filterAddresses();
+                }
+            }
+        }
+
+        // 复制到剪贴板
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showCopyToast();
+            }).catch(() => {
+                // 备用方法
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showCopyToast();
+            });
+        }
+
+        // 显示复制提示
+        function showCopyToast() {
+            const toast = document.getElementById('copyToast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // 返回仪表板
+        function goToDashboard() {
+            window.location.href = 'admin_dashboard_test.html';
+        }
+
+        // 退出登录
+        function logout() {
+            if (confirm('确认退出管理系统？')) {
+                alert('已安全退出管理系统');
+                window.location.href = 'admin_login_test.html';
+            }
+        }
+
+        // 键盘快捷键
+        document.addEventListener('keydown', function(e) {
+            // ESC 关闭模态框
+            if (e.key === 'Escape') {
+                closeAddressModal();
+            }
+        });
+    </script>
+</body>
+</html> 

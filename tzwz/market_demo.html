@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShareOption - 市场行情</title>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(180deg, #1a1a1a 0%, #000000 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        /* 顶部标题栏 */
+        .header {
+            background: #1a1a1a;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .header-title {
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .search-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: #2a2a2a;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-btn:hover {
+            background: #404040;
+            color: #ffffff;
+        }
+
+        /* 分类标签 */
+        .category-tabs {
+            background: #1a1a1a;
+            padding: 15px 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        .tab-list {
+            display: flex;
+            gap: 20px;
+        }
+
+        .tab-item {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 8px 0;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .tab-item.active {
+            color: #00C851;
+        }
+
+        .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #00C851;
+        }
+
+        /* 表格头部 */
+        .table-header {
+            background: #2a2a2a;
+            padding: 12px 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 10px;
+            font-size: 12px;
+            color: #888;
+            font-weight: 500;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            height: calc(100vh - 60px - 80px - 60px - 45px);
+            overflow-y: auto;
+        }
+
+        /* 市场列表 */
+        .market-list {
+            background: #0f0f0f;
+        }
+
+        .market-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #2a2a2a;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .market-item:hover {
+            background: #1a1a1a;
+        }
+
+        .symbol-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .symbol-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .btc-icon { background: linear-gradient(135deg, #f7931a, #e6860a); }
+        .eth-icon { background: linear-gradient(135deg, #627eea, #5a73d8); }
+        .ltc-icon { background: linear-gradient(135deg, #bfbbbb, #a6a6a6); }
+        .xrp-icon { background: linear-gradient(135deg, #23292f, #1a1f24); }
+        .gold-icon { background: linear-gradient(135deg, #FFD700, #FFA500); }
+        .silver-icon { background: linear-gradient(135deg, #C0C0C0, #808080); }
+        .oil-icon { background: linear-gradient(135deg, #2C1810, #8B4513); }
+        .gas-icon { background: linear-gradient(135deg, #4169E1, #1E90FF); }
+
+        .symbol-details {
+            flex: 1;
+        }
+
+        .symbol-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            color: #ffffff;
+        }
+
+        .symbol-desc {
+            font-size: 11px;
+            color: #888;
+        }
+
+        .symbol-price {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            text-align: right;
+        }
+
+        .symbol-change {
+            font-size: 12px;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .symbol-volume {
+            font-size: 11px;
+            color: #888;
+            text-align: right;
+        }
+
+        .change-up { color: #00C851; }
+        .change-down { color: #ff4444; }
+
+        /* 热门标签 */
+        .hot-tag {
+            background: linear-gradient(135deg, #ff4444, #cc1100);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+        }
+
+        .new-tag {
+            background: linear-gradient(135deg, #00C851, #007E33);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            display: flex;
+            background: #1a1a1a;
+            border-top: 1px solid #333;
+            height: 80px;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            text-decoration: none;
+            font-size: 12px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #00C851;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        /* 滚动条样式 */
+        .main-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .main-content::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        .main-content::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 2px;
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #888;
+        }
+
+        .loading i {
+            margin-right: 8px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 480px) {
+            .table-header, .market-item {
+                grid-template-columns: 2fr 1fr 1fr;
+            }
+            
+            .symbol-volume {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部标题栏 -->
+    <div class="header">
+        <div class="header-title">Market</div>
+        <button class="search-btn">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
+
+    <!-- 分类标签 -->
+    <div class="category-tabs">
+        <div class="tab-list">
+            <button class="tab-item active" data-category="all">全部</button>
+            <button class="tab-item" data-category="crypto">加密货币</button>
+            <button class="tab-item" data-category="precious">贵金属</button>
+            <button class="tab-item" data-category="energy">能源</button>
+        </div>
+    </div>
+
+    <!-- 表格头部 -->
+    <div class="table-header">
+        <div>交易对</div>
+        <div>价格</div>
+        <div>24h涨跌</div>
+        <div class="volume-header">24h成交量</div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <div class="main-content">
+        <div class="market-list" id="marketList">
+            <!-- 市场数据将通过JavaScript动态生成 -->
+        </div>
+        
+        <div class="loading" id="loadingIndicator" style="display: none;">
+            <i class="fas fa-spinner"></i>
+            <span>加载中...</span>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <a href="#" class="nav-item" onclick="goToHome()">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="#" class="nav-item active">
+            <i class="fas fa-chart-line"></i>
+            <span>Market</span>
+        </a>
+        <a href="#" class="nav-item" onclick="goToContract()">
+            <i class="fas fa-file-contract"></i>
+            <span>Contract</span>
+        </a>
+        <a href="#" class="nav-item" onclick="goToTrade()">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Trade</span>
+        </a>
+        <a href="#" class="nav-item" onclick="goToWallet()">
+            <i class="fas fa-wallet"></i>
+            <span>Wallet</span>
+        </a>
+    </div>
+
+    <script>
+        // 市场数据
+        const marketData = {
+            crypto: [
+                {
+                    symbol: 'BTC/USDT',
+                    name: '比特币',
+                    price: 86367.4,
+                    change: -2.77,
+                    volume: '2.3B',
+                    icon: 'btc-icon',
+                    iconText: '₿',
+                    isHot: true
+                },
+                {
+                    symbol: 'ETH/USDT',
+                    name: '以太坊',
+                    price: 3245.12,
+                    change: 1.23,
+                    volume: '1.8B',
+                    icon: 'eth-icon',
+                    iconText: 'Ξ'
+                },
+                {
+                    symbol: 'LTC/USDT',
+                    name: '莱特币',
+                    price: 145.67,
+                    change: 0.89,
+                    volume: '145M',
+                    icon: 'ltc-icon',
+                    iconText: 'Ł'
+                },
+                {
+                    symbol: 'XRP/USDT',
+                    name: '瑞波币',
+                    price: 0.6234,
+                    change: -0.45,
+                    volume: '234M',
+                    icon: 'xrp-icon',
+                    iconText: '◉'
+                }
+            ],
+            precious: [
+                {
+                    symbol: 'GOLD/USDT',
+                    name: '黄金',
+                    price: 2035.50,
+                    change: 0.15,
+                    volume: '89M',
+                    icon: 'gold-icon',
+                    iconText: 'Au',
+                    isNew: true
+                },
+                {
+                    symbol: 'SILVER/USDT',
+                    name: '白银',
+                    price: 24.67,
+                    change: -0.23,
+                    volume: '45M',
+                    icon: 'silver-icon',
+                    iconText: 'Ag'
+                }
+            ],
+            energy: [
+                {
+                    symbol: 'OIL/USDT',
+                    name: '原油',
+                    price: 74.32,
+                    change: 1.45,
+                    volume: '156M',
+                    icon: 'oil-icon',
+                    iconText: 'OIL'
+                },
+                {
+                    symbol: 'GAS/USDT',
+                    name: '天然气',
+                    price: 2.89,
+                    change: -2.15,
+                    volume: '67M',
+                    icon: 'gas-icon',
+                    iconText: 'GAS'
+                }
+            ]
+        };
+
+        let currentCategory = 'all';
+
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            renderMarketList();
+            
+            // 每5秒更新价格
+            setInterval(updatePrices, 5000);
+            
+            // 绑定分类标签事件
+            bindTabEvents();
+            
+            // 绑定导航事件
+            bindNavEvents();
+            
+            // 绑定搜索事件
+            bindSearchEvent();
+        });
+
+        // 渲染市场列表
+        function renderMarketList() {
+            const marketList = document.getElementById('marketList');
+            marketList.innerHTML = '';
+
+            let dataToShow = [];
+            
+            if (currentCategory === 'all') {
+                dataToShow = [...marketData.crypto, ...marketData.precious, ...marketData.energy];
+            } else {
+                dataToShow = marketData[currentCategory] || [];
+            }
+
+            dataToShow.forEach(item => {
+                const marketItem = createMarketItem(item);
+                marketList.appendChild(marketItem);
+            });
+        }
+
+        // 创建市场项目
+        function createMarketItem(data) {
+            const item = document.createElement('div');
+            item.className = 'market-item';
+            item.onclick = () => goToTradeWithSymbol(data.symbol);
+
+            const tags = [];
+            if (data.isHot) tags.push('<span class="hot-tag">热门</span>');
+            if (data.isNew) tags.push('<span class="new-tag">新品</span>');
+
+            item.innerHTML = `
+                <div class="symbol-info">
+                    <div class="symbol-icon ${data.icon}">
+                        ${data.iconText}
+                    </div>
+                    <div class="symbol-details">
+                        <div class="symbol-name">
+                            ${data.symbol}
+                            ${tags.join('')}
+                        </div>
+                        <div class="symbol-desc">${data.name}</div>
+                    </div>
+                </div>
+                <div class="symbol-price" id="price-${data.symbol.replace('/', '-')}">
+                    ${formatPrice(data.price, data.symbol)}
+                </div>
+                <div class="symbol-change ${data.change >= 0 ? 'change-up' : 'change-down'}" id="change-${data.symbol.replace('/', '-')}">
+                    ${data.change >= 0 ? '+' : ''}${data.change.toFixed(2)}%
+                </div>
+                <div class="symbol-volume volume-header">
+                    ${data.volume}
+                </div>
+            `;
+
+            return item;
+        }
+
+        // 格式化价格显示
+        function formatPrice(price, symbol) {
+            if (symbol.includes('XRP') || symbol.includes('GAS')) {
+                return price.toFixed(4);
+            } else if (symbol.includes('SILVER')) {
+                return price.toFixed(2);
+            } else {
+                return price.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            }
+        }
+
+        // 更新价格
+        function updatePrices() {
+            Object.keys(marketData).forEach(category => {
+                marketData[category].forEach(item => {
+                    // 模拟价格变化
+                    const changePercent = (Math.random() - 0.5) * 0.02; // 2%范围内变化
+                    item.price *= (1 + changePercent);
+                    item.change = (Math.random() - 0.5) * 10;
+
+                    // 更新DOM显示
+                    const priceElement = document.getElementById(`price-${item.symbol.replace('/', '-')}`);
+                    const changeElement = document.getElementById(`change-${item.symbol.replace('/', '-')}`);
+
+                    if (priceElement) {
+                        priceElement.textContent = formatPrice(item.price, item.symbol);
+                    }
+
+                    if (changeElement) {
+                        changeElement.textContent = (item.change >= 0 ? '+' : '') + item.change.toFixed(2) + '%';
+                        changeElement.className = `symbol-change ${item.change >= 0 ? 'change-up' : 'change-down'}`;
+                    }
+                });
+            });
+        }
+
+        // 绑定分类标签事件
+        function bindTabEvents() {
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // 更新活跃状态
+                    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 更新当前分类
+                    currentCategory = this.dataset.category;
+                    
+                    // 显示加载动画
+                    showLoading();
+                    
+                    // 延时渲染（模拟加载效果）
+                    setTimeout(() => {
+                        renderMarketList();
+                        hideLoading();
+                    }, 300);
+                });
+            });
+        }
+
+        // 显示加载动画
+        function showLoading() {
+            document.getElementById('loadingIndicator').style.display = 'flex';
+            document.getElementById('marketList').style.opacity = '0.5';
+        }
+
+        // 隐藏加载动画
+        function hideLoading() {
+            document.getElementById('loadingIndicator').style.display = 'none';
+            document.getElementById('marketList').style.opacity = '1';
+        }
+
+        // 绑定搜索事件
+        function bindSearchEvent() {
+            document.querySelector('.search-btn').addEventListener('click', function() {
+                const searchTerm = prompt('请输入要搜索的交易对名称:');
+                if (searchTerm) {
+                    searchMarket(searchTerm);
+                }
+            });
+        }
+
+        // 搜索市场
+        function searchMarket(term) {
+            const allData = [...marketData.crypto, ...marketData.precious, ...marketData.energy];
+            const results = allData.filter(item => 
+                item.symbol.toLowerCase().includes(term.toLowerCase()) ||
+                item.name.toLowerCase().includes(term.toLowerCase())
+            );
+            
+            if (results.length > 0) {
+                // 显示搜索结果
+                const marketList = document.getElementById('marketList');
+                marketList.innerHTML = '';
+                results.forEach(item => {
+                    const marketItem = createMarketItem(item);
+                    marketList.appendChild(marketItem);
+                });
+                
+                // 更新标签状态
+                document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            } else {
+                alert('未找到相关交易对');
+            }
+        }
+
+        // 导航功能
+        function goToHome() {
+            window.open('home_demo.html', '_blank');
+        }
+
+        function goToTrade() {
+            window.open('trading_demo.html', '_blank');
+        }
+
+        function goToTradeWithSymbol(symbol) {
+            // 跳转到交易页面并设置对应的交易对
+            alert(`即将进入 ${symbol} 交易页面`);
+            window.open('trading_demo.html', '_blank');
+        }
+
+        function goToContract() {
+            alert('合约页面开发中...');
+        }
+
+        function goToWallet() {
+            alert('钱包页面开发中...');
+        }
+
+        // 绑定导航事件
+        function bindNavEvents() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (!this.classList.contains('active')) {
+                        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                        this.classList.add('active');
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShareOption - 交易</title>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        /* 顶部标题栏 */
+        .header {
+            background: #000000;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .platform-name {
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .futures-text {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .symbol-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .symbol-name {
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .symbol-change {
+            color: #ff4444;
+            font-size: 12px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .menu-btn {
+            color: #888;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            height: calc(100vh - 60px - 80px);
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* 左侧价格列表 */
+        .price-list {
+            width: 120px;
+            background: #0a0a0a;
+            overflow-y: auto;
+            border-right: 1px solid #333;
+        }
+
+        .price-item {
+            padding: 8px 12px;
+            font-size: 12px;
+            border-bottom: 1px solid #222;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .price-item:hover {
+            background: #1a1a1a;
+        }
+
+        .price-up { color: #00C851; }
+        .price-down { color: #ff4444; }
+
+        /* 中央交易区域 */
+        .trading-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #111111;
+        }
+
+        /* Rise/Fall 按钮区域 */
+        .trade-buttons {
+            display: flex;
+            padding: 15px;
+            gap: 10px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
+        }
+
+        .trade-btn {
+            flex: 1;
+            height: 50px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .rise-btn {
+            background: linear-gradient(135deg, #00C851, #007E33);
+            color: #ffffff;
+        }
+
+        .fall-btn {
+            background: linear-gradient(135deg, #ff4444, #cc1100);
+            color: #ffffff;
+        }
+
+        .trade-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 200, 81, 0.5);
+        }
+
+        .fall-btn.active {
+            box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+        }
+
+        /* OpenTime 区域 */
+        .open-time {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            gap: 30px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
+        }
+
+        .time-option {
+            font-size: 18px;
+            color: #888;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .time-option.active {
+            color: #00C851;
+            background: rgba(0, 200, 81, 0.1);
+        }
+
+        /* 时间选择网格 */
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 20px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
+        }
+
+        .time-card {
+            background: #2a2a2a;
+            border: 2px solid #404040;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .time-card:hover {
+            border-color: #00C851;
+            background: #333;
+        }
+
+        .time-card.selected {
+            border-color: #00C851;
+            background: rgba(0, 200, 81, 0.1);
+        }
+
+        .time-duration {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .time-earnings {
+            font-size: 11px;
+            color: #00C851;
+        }
+
+        /* 中央价格显示 */
+        .price-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            background: #0a0a0a;
+            border-bottom: 1px solid #333;
+        }
+
+        .current-price {
+            font-size: 48px;
+            font-weight: bold;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        /* 订单信息 */
+        .order-info {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
+            font-size: 12px;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-label {
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        /* 交易控制区域 */
+        .trading-controls {
+            padding: 20px;
+            background: #111111;
+        }
+
+        .amount-input {
+            width: 100%;
+            background: #2a2a2a;
+            border: 1px solid #404040;
+            border-radius: 8px;
+            padding: 12px;
+            color: #ffffff;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .amount-input:focus {
+            outline: none;
+            border-color: #00C851;
+        }
+
+        .amount-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .amount-btn {
+            background: #2a2a2a;
+            border: 1px solid #404040;
+            border-radius: 6px;
+            padding: 10px;
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .amount-btn:hover {
+            background: #404040;
+            border-color: #00C851;
+        }
+
+        .amount-btn.selected {
+            background: #00C851;
+            border-color: #00C851;
+        }
+
+        .buy-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .buy-btn {
+            flex: 1;
+            height: 50px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .buy-rise {
+            background: linear-gradient(135deg, #00C851, #007E33);
+            color: #ffffff;
+        }
+
+        .buy-fall {
+            background: linear-gradient(135deg, #ff4444, #cc1100);
+            color: #ffffff;
+        }
+
+        .buy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 底部订单区域 */
+        .orders-section {
+            background: #0a0a0a;
+            border-top: 1px solid #333;
+            padding: 15px 20px;
+        }
+
+        .orders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .orders-title {
+            font-size: 14px;
+            color: #ffffff;
+        }
+
+        .orders-count {
+            background: #333;
+            color: #888;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .orders-table {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            font-size: 11px;
+        }
+
+        .table-header {
+            color: #888;
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .table-cell {
+            color: #ffffff;
+            padding: 8px 0;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            display: flex;
+            background: #000000;
+            border-top: 1px solid #333;
+            height: 80px;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            text-decoration: none;
+            font-size: 11px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #ff4444;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        /* 滚动条样式 */
+        .price-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .price-list::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        .price-list::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 2px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 480px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .price-list {
+                width: 100%;
+                height: 150px;
+                border-right: none;
+                border-bottom: 1px solid #333;
+            }
+            
+            .time-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .current-price {
+                font-size: 36px;
+            }
+        }
+
+        /* 确认交易模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #2a2a2a;
+            margin: 100px auto;
+            padding: 24px;
+            width: 90%;
+            max-width: 380px;
+            border-radius: 16px;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .modal-subtitle {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .trade-preview {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .preview-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .preview-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .preview-label {
+            color: #888;
+        }
+
+        .preview-value {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .direction-value.rise {
+            color: #00C851;
+        }
+
+        .direction-value.fall {
+            color: #ff4444;
+        }
+
+        .earnings-value {
+            color: #00C851;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            height: 48px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-btn {
+            background: #404040;
+            color: #ffffff;
+        }
+
+        .cancel-btn:hover {
+            background: #555;
+        }
+
+        .confirm-btn {
+            background: linear-gradient(135deg, #00C851, #007E33);
+            color: #ffffff;
+        }
+
+        .confirm-btn:hover {
+            background: linear-gradient(135deg, #007E33, #00C851);
+        }
+
+        .confirm-btn.fall {
+            background: linear-gradient(135deg, #ff4444, #cc1100);
+        }
+
+        .confirm-btn.fall:hover {
+            background: linear-gradient(135deg, #cc1100, #ff4444);
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部标题栏 -->
+    <div class="header">
+        <div class="header-left">
+            <div class="platform-name">ShareOption</div>
+            <div class="futures-text">Futures</div>
+            <div class="symbol-info">
+                <div class="symbol-name">BTC/USDT</div>
+                <div class="symbol-change" id="symbolChange">-0.09%</div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="menu-btn">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div class="menu-btn">
+                <i class="fas fa-volume-up"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <div class="main-content">
+        <!-- 左侧价格列表 -->
+        <div class="price-list" id="priceList">
+            <!-- 价格数据将通过JavaScript动态生成 -->
+        </div>
+
+        <!-- 中央交易区域 -->
+        <div class="trading-area">
+            <!-- Rise/Fall 按钮 -->
+            <div class="trade-buttons">
+                <button class="trade-btn rise-btn" id="riseBtn" onclick="selectDirection('rise')">
+                    Rise
+                </button>
+                <button class="trade-btn fall-btn" id="fallBtn" onclick="selectDirection('fall')">
+                    Fall
+                </button>
+            </div>
+
+            <!-- OpenTime 标签 -->
+            <div class="open-time">
+                <div class="time-option active">S</div>
+                <div style="color: #666;">OpenTime</div>
+                <div class="time-option">D</div>
+            </div>
+
+            <!-- 时间选择网格 -->
+            <div class="time-grid">
+                <div class="time-card" onclick="selectTime('60s')" data-time="60s">
+                    <div class="time-duration">60s</div>
+                    <div class="time-earnings">Earnings+10%</div>
+                </div>
+                <div class="time-card" onclick="selectTime('90s')" data-time="90s">
+                    <div class="time-duration">90s</div>
+                    <div class="time-earnings">Earnings+15%</div>
+                </div>
+                <div class="time-card selected" onclick="selectTime('120s')" data-time="120s">
+                    <div class="time-duration">120s</div>
+                    <div class="time-earnings">Earnings+25%</div>
+                </div>
+                <div class="time-card" onclick="selectTime('180s')" data-time="180s">
+                    <div class="time-duration">180s</div>
+                    <div class="time-earnings">Earnings+35%</div>
+                </div>
+                <div class="time-card" onclick="selectTime('300s')" data-time="300s">
+                    <div class="time-duration">300s</div>
+                    <div class="time-earnings">Earnings+55%</div>
+                </div>
+                <div class="time-card" onclick="selectTime('600s')" data-time="600s">
+                    <div class="time-duration">600s</div>
+                    <div class="time-earnings">Earnings+75%</div>
+                </div>
+                <div class="time-card" onclick="selectTime('1200s')" data-time="1200s">
+                    <div class="time-duration">1200s</div>
+                    <div class="time-earnings">Earnings+120%</div>
+                </div>
+            </div>
+
+            <!-- 中央价格显示 -->
+            <div class="price-display">
+                <div class="current-price" id="currentPrice">96153.3</div>
+            </div>
+
+            <!-- 订单信息 -->
+            <div class="order-info">
+                <div class="info-item">
+                    <div class="info-label">OpenPrice</div>
+                    <div class="info-value" id="openPrice">96153.3</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Usable</div>
+                    <div class="info-value">94500USDT</div>
+                </div>
+            </div>
+
+            <!-- 交易控制区域 -->
+            <div class="trading-controls">
+                <input type="number" class="amount-input" id="tradeAmount" placeholder="100" value="100">
+                
+                <div class="amount-buttons">
+                    <button class="amount-btn selected" onclick="setAmount(100)">100</button>
+                    <button class="amount-btn" onclick="setAmount(1000)">1000</button>
+                    <button class="amount-btn" onclick="setAmount(5000)">5000</button>
+                    <button class="amount-btn" onclick="setAmount(10000)">10000</button>
+                    <button class="amount-btn" onclick="setAmount(50000)">50000</button>
+                    <button class="amount-btn" onclick="setAllIn()">All in</button>
+                </div>
+
+                <div class="buy-buttons">
+                    <button class="buy-btn buy-rise" onclick="placeTrade('rise')">
+                        BuyRise
+                    </button>
+                    <button class="buy-btn buy-fall" onclick="placeTrade('fall')">
+                        BuyFall
+                    </button>
+                </div>
+            </div>
+
+            <!-- 底部订单区域 -->
+            <div class="orders-section">
+                <div class="orders-header">
+                    <div class="orders-title">PositionOrder(0)</div>
+                    <div class="orders-count">All Order</div>
+                </div>
+                <div class="orders-table">
+                    <div class="table-header">BTC/USDT</div>
+                    <div class="table-header">OpenPrice</div>
+                    <div class="table-header">OpenTime</div>
+                    <div class="table-cell">Rise/Fall</div>
+                    <div class="table-cell">96653.3</div>
+                    <div class="table-cell">2025-02-10 06:44:57</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 确认交易模态框 -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">确认交易订单</div>
+                <div class="modal-subtitle">请确认以下交易信息</div>
+            </div>
+            
+            <div class="trade-preview">
+                <div class="preview-row">
+                    <span class="preview-label">交易对</span>
+                    <span class="preview-value">BTC/USDT</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">方向</span>
+                    <span class="preview-value direction-value" id="previewDirection">买涨</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">投入金额</span>
+                    <span class="preview-value" id="previewAmount">100 USDT</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">交易时长</span>
+                    <span class="preview-value" id="previewDuration">120s</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">开仓价格</span>
+                    <span class="preview-value" id="previewPrice">96153.3</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">预期收益</span>
+                    <span class="preview-value earnings-value" id="previewEarnings">+25 USDT (25%)</span>
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-btn cancel-btn" onclick="closeConfirmModal()">取消</button>
+                <button class="modal-btn confirm-btn" id="confirmButton" onclick="executeOrder()">确认交易</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <a href="#" class="nav-item" onclick="goToHome()">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="#" class="nav-item" onclick="goToMarket()">
+            <i class="fas fa-chart-bar"></i>
+            <span>Market</span>
+        </a>
+        <a href="#" class="nav-item" onclick="goToContract()">
+            <i class="fas fa-file-contract"></i>
+            <span>Contract</span>
+        </a>
+        <a href="#" class="nav-item active">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Option</span>
+        </a>
+        <a href="#" class="nav-item" onclick="goToWallet()">
+            <i class="fas fa-wallet"></i>
+            <span>Wallet</span>
+        </a>
+    </div>
+
+    <script>
+        // 交易数据
+        let tradingData = {
+            currentPrice: 96153.3,
+            direction: 'rise',
+            selectedTime: '120s',
+            amount: 100,
+            openPrice: 96153.3,
+            usableBalance: 94500
+        };
+
+        // 价格历史数据
+        let priceHistory = [
+            96153.98, 96153.78, 96153.52, 96153.4, 96153.36, 96153.3,
+            96153.23, 96153.03, 96152.91, 96152.7, 96152.5, 96152.3,
+            96152.1, 96151.9, 96151.7, 96151.5, 96151.3, 96151.1
+        ];
+
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updatePriceList();
+            updateDisplay();
+            
+            // 每秒更新价格
+            setInterval(updatePrice, 1000);
+            
+            // 绑定导航事件
+            bindNavEvents();
+        });
+
+        // 更新价格列表
+        function updatePriceList() {
+            const priceList = document.getElementById('priceList');
+            priceList.innerHTML = '';
+
+            priceHistory.forEach((price, index) => {
+                const priceItem = document.createElement('div');
+                priceItem.className = 'price-item';
+                
+                // 随机决定涨跌颜色
+                const isUp = Math.random() > 0.5;
+                priceItem.classList.add(isUp ? 'price-up' : 'price-down');
+                priceItem.textContent = price.toFixed(2);
+                
+                priceList.appendChild(priceItem);
+            });
+        }
+
+        // 更新价格
+        function updatePrice() {
+            // 模拟价格变化
+            const change = (Math.random() - 0.5) * 10;
+            tradingData.currentPrice += change;
+            
+            // 更新价格历史
+            priceHistory.unshift(tradingData.currentPrice);
+            if (priceHistory.length > 20) {
+                priceHistory.pop();
+            }
+            
+            updateDisplay();
+            updatePriceList();
+        }
+
+        // 更新显示
+        function updateDisplay() {
+            document.getElementById('currentPrice').textContent = tradingData.currentPrice.toFixed(1);
+            document.getElementById('openPrice').textContent = tradingData.openPrice.toFixed(1);
+        }
+
+        // 选择方向
+        function selectDirection(direction) {
+            tradingData.direction = direction;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.trade-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            if (direction === 'rise') {
+                document.getElementById('riseBtn').classList.add('active');
+            } else {
+                document.getElementById('fallBtn').classList.add('active');
+            }
+        }
+
+        // 选择时间
+        function selectTime(time) {
+            tradingData.selectedTime = time;
+            
+            // 更新时间卡片状态
+            document.querySelectorAll('.time-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            document.querySelector(`[data-time="${time}"]`).classList.add('selected');
+        }
+
+        // 设置金额
+        function setAmount(amount) {
+            tradingData.amount = amount;
+            document.getElementById('tradeAmount').value = amount;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.amount-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            event.target.classList.add('selected');
+        }
+
+        // 全仓
+        function setAllIn() {
+            tradingData.amount = tradingData.usableBalance;
+            document.getElementById('tradeAmount').value = tradingData.usableBalance;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.amount-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            event.target.classList.add('selected');
+        }
+
+        // 下单
+        function placeTrade(direction) {
+            const amount = parseFloat(document.getElementById('tradeAmount').value);
+            
+            if (!amount || amount <= 0) {
+                alert('请输入有效的交易金额');
+                return;
+            }
+            
+            if (amount > tradingData.usableBalance) {
+                alert('余额不足');
+                return;
+            }
+
+            // 获取收益率
+            const timeCard = document.querySelector('.time-card.selected');
+            const earningsText = timeCard.querySelector('.time-earnings').textContent;
+            const earningsRate = parseFloat(earningsText.match(/\d+/)[0]);
+
+            // 显示确认模态框
+            showConfirmModal(direction, amount, earningsRate);
+        }
+
+        // 显示确认模态框
+        function showConfirmModal(direction, amount, earningsRate) {
+            const directionText = direction === 'rise' ? '买涨' : '买跌';
+            const directionClass = direction === 'rise' ? 'rise' : 'fall';
+            const expectedProfit = (amount * earningsRate / 100).toFixed(2);
+            
+            // 更新模态框内容
+            document.getElementById('previewDirection').textContent = directionText;
+            document.getElementById('previewDirection').className = `preview-value direction-value ${directionClass}`;
+            document.getElementById('previewAmount').textContent = `${amount} USDT`;
+            document.getElementById('previewDuration').textContent = tradingData.selectedTime;
+            document.getElementById('previewPrice').textContent = tradingData.currentPrice.toFixed(2);
+            document.getElementById('previewEarnings').textContent = `+${expectedProfit} USDT (${earningsRate}%)`;
+            
+            // 更新确认按钮样式
+            const confirmButton = document.getElementById('confirmButton');
+            confirmButton.className = `modal-btn confirm-btn ${directionClass}`;
+            confirmButton.textContent = direction === 'rise' ? '确认买涨' : '确认买跌';
+            
+            // 保存当前交易信息
+            tradingData.pendingDirection = direction;
+            tradingData.pendingAmount = amount;
+            tradingData.pendingEarningsRate = earningsRate;
+            
+            // 显示模态框
+            document.getElementById('confirmModal').style.display = 'block';
+        }
+
+        // 关闭确认模态框
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').style.display = 'none';
+            delete tradingData.pendingDirection;
+            delete tradingData.pendingAmount;
+            delete tradingData.pendingEarningsRate;
+        }
+
+        // 执行订单
+        function executeOrder() {
+            const direction = tradingData.pendingDirection;
+            const amount = tradingData.pendingAmount;
+            const earningsRate = tradingData.pendingEarningsRate;
+            
+            // 扣除余额
+            tradingData.usableBalance -= amount;
+            
+            // 更新余额显示
+            document.querySelector('.info-value:last-child').textContent = tradingData.usableBalance.toFixed(0) + 'USDT';
+            
+            // 关闭模态框
+            closeConfirmModal();
+            
+            // 显示成功提示
+            alert(`下单成功！\n\n订单信息：\n方向：${direction === 'rise' ? '买涨' : '买跌'}\n金额：${amount} USDT\n时长：${tradingData.selectedTime}\n开仓价：${tradingData.currentPrice.toFixed(2)}\n预期收益：${earningsRate}%\n\n请在合约页面查看订单详情。`);
+        }
+
+        // 导航功能
+        function goToHome() {
+            window.open('home_demo.html', '_blank');
+        }
+
+        function goToMarket() {
+            window.open('market_demo.html', '_blank');
+        }
+
+        function goToContract() {
+            window.open('contract_demo.html', '_blank');
+        }
+
+        function goToWallet() {
+            window.open('wallet_demo.html', '_blank');
+        }
+
+        // 绑定导航事件
+        function bindNavEvents() {
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (!this.classList.contains('active')) {
+                        document.querySelectorAll('.bottom-nav .nav-item').forEach(nav => nav.classList.remove('active'));
+                        this.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        // 金额输入框事件
+        document.getElementById('tradeAmount').addEventListener('input', function() {
+            tradingData.amount = parseFloat(this.value) || 0;
+            
+            // 清除所有按钮选中状态
+            document.querySelectorAll('.amount-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+        });
+
+        // 点击模态框外部关闭
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('confirmModal');
+            if (event.target === modal) {
+                closeConfirmModal();
+            }
+        });
+    </script>
+</body>
+</html> 

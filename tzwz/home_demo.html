@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShareOption - 首页</title>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        /* 顶部标题栏 */
+        .header {
+            background: #000000;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000000;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .welcome-text {
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .verify-btn, .language-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .verify-btn {
+            background: linear-gradient(135deg, #ff4444, #cc1100);
+            color: #ffffff;
+            position: relative;
+        }
+
+        .verify-btn.verified {
+            background: linear-gradient(135deg, #00C851, #007E33);
+        }
+
+        .verify-btn.pending {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+        }
+
+        .language-btn {
+            background: #2a2a2a;
+            color: #888;
+        }
+
+        .verify-btn:hover, .language-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .language-btn:hover {
+            background: #404040;
+            color: #ffffff;
+        }
+
+        .verify-status-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid #000000;
+        }
+
+        .status-unverified { background: #ff4444; }
+        .status-pending { background: #ffc107; }
+        .status-verified { background: #00C851; }
+
+        .settings-icon {
+            color: #888;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            height: calc(100vh - 60px - 80px);
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        /* Bitcoin 横幅 */
+        .banner-section {
+            background: linear-gradient(135deg, rgba(0, 200, 81, 0.2), rgba(0, 126, 51, 0.1)), 
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200"><rect fill="%23001100" width="400" height="200"/><path d="M50 150 Q100 100 150 120 T250 100 T350 130" stroke="%2300C851" stroke-width="3" fill="none"/><circle cx="80" cy="80" r="30" fill="%23FFD700" opacity="0.8"/><text x="80" y="88" text-anchor="middle" fill="%23000" font-size="20" font-weight="bold">₿</text></svg>') center/cover;
+            height: 120px;
+            margin: 10px 20px;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .banner-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+            padding: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .banner-icon {
+            color: #ffffff;
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .banner-text {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* 价格显示区域 */
+        .price-section {
+            display: flex;
+            padding: 15px 20px;
+            gap: 10px;
+        }
+
+        .price-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .price-symbol {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .price-change {
+            font-size: 10px;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .price-main {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .price-usd {
+            font-size: 11px;
+            color: #888;
+        }
+
+        .price-up { color: #00C851; }
+        .price-down { color: #ff4444; }
+
+        /* 快速功能按钮 */
+        .quick-actions {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px 40px;
+            margin: 10px 0;
+        }
+
+        .action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .action-item:hover {
+            transform: scale(1.05);
+        }
+
+        .action-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            font-size: 20px;
+        }
+
+        .recharge-icon { background: linear-gradient(135deg, #00C851, #007E33); }
+        .option-icon { background: linear-gradient(135deg, #007bff, #0056b3); }
+        .contract-icon { background: linear-gradient(135deg, #ffc107, #e0a800); }
+        .invite-icon { background: linear-gradient(135deg, #ff4444, #cc1100); }
+
+        .action-label {
+            font-size: 12px;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        /* 借贷卡片 */
+        .borrow-card {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            margin: 10px 20px;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #333;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .borrow-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -30px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            border-radius: 50%;
+            opacity: 0.1;
+        }
+
+        .borrow-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+
+        .borrow-subtitle {
+            font-size: 13px;
+            color: #00C851;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .borrow-description {
+            font-size: 11px;
+            color: #ccc;
+            line-height: 1.4;
+        }
+
+        .borrow-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: #007bff;
+        }
+
+        /* 市场部分 */
+        .market-section {
+            margin: 20px 20px 0;
+        }
+
+        .market-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .market-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .market-table-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+            padding: 0 15px 8px;
+            font-size: 11px;
+            color: #888;
+        }
+
+        .market-list {
+            background: #111111;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .market-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #222;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .market-item:hover {
+            background: #1a1a1a;
+        }
+
+        .market-item:last-child {
+            border-bottom: none;
+        }
+
+        .market-symbol-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .market-symbol {
+            font-size: 13px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 2px;
+        }
+
+        .market-amount {
+            font-size: 10px;
+            color: #888;
+        }
+
+        .market-price {
+            font-size: 13px;
+            font-weight: 600;
+            color: #ffffff;
+            text-align: right;
+        }
+
+        .market-change {
+            text-align: right;
+            font-size: 11px;
+            font-weight: 500;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .change-positive {
+            background: rgba(0, 200, 81, 0.2);
+            color: #00C851;
+        }
+
+        .change-negative {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            display: flex;
+            background: #000000;
+            border-top: 1px solid #333;
+            height: 80px;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            text-decoration: none;
+            font-size: 11px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #ffffff;
+        }
+
+        .nav-item.option-active {
+            color: #ff4444;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        /* 滚动条样式 */
+        .main-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .main-content::-webkit-scrollbar-track {
+            background: #000000;
+        }
+
+        .main-content::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 2px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 480px) {
+            .quick-actions {
+                padding: 20px 20px;
+            }
+            
+            .action-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #2a2a2a;
+            margin: 50px auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 12px;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            background: #404040;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 12px;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #00C851;
+        }
+
+        .file-upload {
+            border: 2px dashed #555;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: #00C851;
+            background: #404040;
+        }
+
+        .upload-icon {
+            font-size: 24px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 4px;
+        }
+
+        .upload-hint {
+            font-size: 11px;
+            color: #888;
+        }
+
+        .file-preview {
+            background: #404040;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .file-name {
+            font-size: 12px;
+            color: #00C851;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #00C851, #007E33);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #007E33, #00C851);
+        }
+
+        .submit-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        /* 语言选择下拉菜单 */
+        .language-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: #2a2a2a;
+            border: 1px solid #404040;
+            border-radius: 8px;
+            min-width: 120px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            display: none;
+        }
+
+        .language-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #ffffff;
+        }
+
+        .language-item:hover {
+            background: #404040;
+        }
+
+        .language-item.active {
+            background: #00C851;
+        }
+
+        .verification-status {
+            background: #333;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .status-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .status-text {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .status-desc {
+            font-size: 12px;
+            color: #888;
+            line-height: 1.4;
+        }
+
+        .status-unverified .status-icon { color: #ff4444; }
+        .status-unverified .status-text { color: #ff4444; }
+
+        .status-pending .status-icon { color: #ffc107; }
+        .status-pending .status-text { color: #ffc107; }
+
+        .status-verified .status-icon { color: #00C851; }
+        .status-verified .status-text { color: #00C851; }
+    </style>
+</head>
+<body>
+    <!-- 顶部标题栏 -->
+    <div class="header">
+        <div class="user-avatar">
+            <i class="fas fa-user"></i>
+        </div>
+        <div class="welcome-text">Welcome !</div>
+        <div class="header-right">
+            <div class="verify-btn" onclick="showVerification()">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="language-btn" onclick="showLanguageDropdown()">
+                <i class="fas fa-globe"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <div class="main-content">
+        <!-- Bitcoin 横幅 -->
+        <div class="banner-section" onclick="goToTrade()">
+            <div class="banner-overlay">
+                <i class="fas fa-volume-down banner-icon"></i>
+                <span class="banner-text">New Contract Trading Platform Launch!</span>
+            </div>
+        </div>
+
+        <!-- 价格显示区域 -->
+        <div class="price-section">
+            <div class="price-item">
+                <div class="price-symbol">BTC/USDT</div>
+                <div class="price-change price-down" id="btcChange">-0.09%</div>
+                <div class="price-main" id="btcPrice">96699.9</div>
+                <div class="price-usd" id="btcUsd">$96920.10</div>
+            </div>
+            <div class="price-item">
+                <div class="price-symbol">ETH/USDT</div>
+                <div class="price-change price-down" id="ethChange">-4.75%</div>
+                <div class="price-main" id="ethPrice">2811.76</div>
+                <div class="price-usd" id="ethUsd">$2697.91</div>
+            </div>
+            <div class="price-item">
+                <div class="price-symbol">LTC/USDT</div>
+                <div class="price-change price-down" id="ltcChange">-2.00%</div>
+                <div class="price-main" id="ltcPrice">124.78</div>
+                <div class="price-usd" id="ltcUsd">$130.38</div>
+            </div>
+        </div>
+
+        <!-- 快速功能按钮 -->
+        <div class="quick-actions">
+            <div class="action-item" onclick="goToWallet()">
+                <div class="action-icon recharge-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="action-label">Recharge</div>
+            </div>
+            <div class="action-item" onclick="goToTrade()">
+                <div class="action-icon option-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="action-label">Option</div>
+            </div>
+            <div class="action-item" onclick="goToContract()">
+                <div class="action-icon contract-icon">
+                    <i class="fas fa-file-contract"></i>
+                </div>
+                <div class="action-label">Contract</div>
+            </div>
+            <div class="action-item" onclick="showInvite()">
+                <div class="action-icon invite-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="action-label">Invite</div>
+            </div>
+        </div>
+
+        <!-- 借贷卡片 -->
+        <div class="borrow-card" onclick="showBorrow()">
+            <div class="borrow-title">Borrow</div>
+            <div class="borrow-subtitle">Newly launched pledge earning and financial lending</div>
+            <div class="borrow-description">Help you explore more trading opportunities and financial products</div>
+            <div class="borrow-icon">
+                <i class="fas fa-credit-card"></i>
+            </div>
+        </div>
+
+        <!-- 市场部分 -->
+        <div class="market-section">
+            <div class="market-header">
+                <div class="market-title">Market</div>
+            </div>
+            
+            <div class="market-table-header">
+                <div>Queue/Amount</div>
+                <div style="text-align: right;">LastPrice</div>
+                <div style="text-align: right;">Chg(24H)</div>
+            </div>
+            
+            <div class="market-list">
+                <div class="market-item" onclick="goToTradeWithSymbol('XAUT/USDT')">
+                    <div class="market-symbol-info">
+                        <div class="market-symbol">XAUT/USDT</div>
+                        <div class="market-amount" id="xautAmount">$163.00</div>
+                    </div>
+                    <div class="market-price" id="xautPrice">2896.960</div>
+                    <div class="market-change change-positive" id="xautChange">+0.60%</div>
+                </div>
+                
+                <div class="market-item" onclick="goToTradeWithSymbol('BTC/USDT')">
+                    <div class="market-symbol-info">
+                        <div class="market-symbol">BTC/USDT</div>
+                        <div class="market-amount" id="btcAmount">$20.89</div>
+                    </div>
+                    <div class="market-price" id="btcMarketPrice">96699.90</div>
+                    <div class="market-change change-negative" id="btcMarketChange">-0.09%</div>
+                </div>
+                
+                <div class="market-item" onclick="goToTradeWithSymbol('ETH/USDT')">
+                    <div class="market-symbol-info">
+                        <div class="market-symbol">ETH/USDT</div>
+                        <div class="market-amount" id="ethAmount"></div>
+                    </div>
+                    <div class="market-price" id="ethMarketPrice">2811.76</div>
+                    <div class="market-change change-negative" id="ethMarketChange">-4.75%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="#" class="nav-item" onclick="goToMarket()">
+            <i class="fas fa-chart-bar"></i>
+            <span>Market</span>
+        </a>
+        <a href="#" class="nav-item" onclick="goToContract()">
+            <i class="fas fa-file-contract"></i>
+            <span>Contract</span>
+        </a>
+        <a href="#" class="nav-item option-active">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Option</span>
+        </a>
+        <a href="#" class="nav-item" onclick="goToWallet()">
+            <i class="fas fa-wallet"></i>
+            <span>Wallet</span>
+        </a>
+    </div>
+
+    <!-- 模态框 -->
+    <div id="verificationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">身份认证</h2>
+                <button class="close-btn" onclick="closeVerification()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 当前认证状态 -->
+                <div class="verification-status" id="verificationStatus">
+                    <div class="status-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="status-text">未认证</div>
+                    <div class="status-desc">您需要完成身份认证才能开始交易</div>
+                </div>
+
+                <!-- 认证表单 -->
+                <div id="verificationForm">
+                    <div class="form-group">
+                        <label class="form-label">真实姓名</label>
+                        <input type="text" id="realName" class="form-input" placeholder="请输入真实姓名">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">身份证号码</label>
+                        <input type="text" id="idNumber" class="form-input" placeholder="请输入身份证号码">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">上传身份证正面 *</label>
+                        <div class="file-upload" id="frontUpload" onclick="triggerFileInput('frontFile')">
+                            <input type="file" id="frontFile" accept="image/*" style="display: none;" onchange="handleFileSelect(this, 'front')">
+                            <div class="upload-icon">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+                            <div class="upload-text">点击上传身份证正面</div>
+                            <div class="upload-hint">支持JPG、PNG格式，最大5MB</div>
+                        </div>
+                        <div class="file-preview" id="frontPreview">
+                            <i class="fas fa-file-image" style="color: #00C851; margin-right: 8px;"></i>
+                            <span class="file-name" id="frontFileName"></span>
+                            <button onclick="removeFile('front')" style="float: right; background: none; border: none; color: #ff4444; cursor: pointer;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">上传身份证反面 *</label>
+                        <div class="file-upload" id="backUpload" onclick="triggerFileInput('backFile')">
+                            <input type="file" id="backFile" accept="image/*" style="display: none;" onchange="handleFileSelect(this, 'back')">
+                            <div class="upload-icon">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+                            <div class="upload-text">点击上传身份证反面</div>
+                            <div class="upload-hint">支持JPG、PNG格式，最大5MB</div>
+                        </div>
+                        <div class="file-preview" id="backPreview">
+                            <i class="fas fa-file-image" style="color: #00C851; margin-right: 8px;"></i>
+                            <span class="file-name" id="backFileName"></span>
+                            <button onclick="removeFile('back')" style="float: right; background: none; border: none; color: #ff4444; cursor: pointer;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">手持身份证照片 *</label>
+                        <div class="file-upload" id="handUpload" onclick="triggerFileInput('handFile')">
+                            <input type="file" id="handFile" accept="image/*" style="display: none;" onchange="handleFileSelect(this, 'hand')">
+                            <div class="upload-icon">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <div class="upload-text">点击上传手持身份证照片</div>
+                            <div class="upload-hint">支持JPG、PNG格式，最大5MB</div>
+                        </div>
+                        <div class="file-preview" id="handPreview">
+                            <i class="fas fa-file-image" style="color: #00C851; margin-right: 8px;"></i>
+                            <span class="file-name" id="handFileName"></span>
+                            <button onclick="removeFile('hand')" style="float: right; background: none; border: none; color: #ff4444; cursor: pointer;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="submit-btn" id="submitVerificationBtn" onclick="submitVerification()">提交审核</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 语言选择下拉菜单 -->
+    <div id="languageDropdown" class="language-dropdown">
+        <div class="language-item active" onclick="setLanguage('zh')">
+            <span>🇨🇳</span>
+            <span>简体中文</span>
+        </div>
+        <div class="language-item" onclick="setLanguage('en')">
+            <span>🇺🇸</span>
+            <span>English</span>
+        </div>
+        <div class="language-item" onclick="setLanguage('tr')">
+            <span>🇹🇷</span>
+            <span>Türkçe</span>
+        </div>
+        <div class="language-item" onclick="setLanguage('de')">
+            <span>🇩🇪</span>
+            <span>Deutsch</span>
+        </div>
+        <div class="language-item" onclick="setLanguage('ja')">
+            <span>🇯🇵</span>
+            <span>日本語</span>
+        </div>
+        <div class="language-item" onclick="setLanguage('it')">
+            <span>🇮🇹</span>
+            <span>Italiano</span>
+        </div>
+        <div class="language-item" onclick="setLanguage('ar')">
+            <span>🇸🇦</span>
+            <span>العربية</span>
+        </div>
+        <div class="language-item" onclick="setLanguage('ko')">
+            <span>🇰🇷</span>
+            <span>한국어</span>
+        </div>
+        <div class="language-item" onclick="setLanguage('es')">
+            <span>🇪🇸</span>
+            <span>Español</span>
+        </div>
+        <div class="language-item" onclick="setLanguage('fr')">
+            <span>🇫🇷</span>
+            <span>Français</span>
+        </div>
+    </div>
+
+    <script>
+        // 价格数据
+        let priceData = {
+            BTC: { 
+                price: 96699.9, 
+                usd: 96920.10, 
+                change: -0.09,
+                marketPrice: 96699.90,
+                amount: '$20.89'
+            },
+            ETH: { 
+                price: 2811.76, 
+                usd: 2697.91, 
+                change: -4.75,
+                marketPrice: 2811.76,
+                amount: ''
+            },
+            LTC: { 
+                price: 124.78, 
+                usd: 130.38, 
+                change: -2.00 
+            },
+            XAUT: {
+                price: 2896.960,
+                change: 0.60,
+                amount: '$163.00'
+            }
+        };
+
+        // 认证状态管理
+        let verificationState = {
+            status: 'unverified', // 'unverified', 'pending', 'verified', 'rejected'
+            frontFile: null,
+            backFile: null,
+            handFile: null
+        };
+
+        // 语言数据
+        const languages = {
+            zh: {
+                welcome: 'Welcome !',
+                recharge: 'Recharge',
+                option: 'Option',
+                contract: 'Contract',
+                invite: 'Invite',
+                borrow: 'Borrow',
+                market: 'Market',
+                home: 'Home',
+                wallet: 'Wallet'
+            },
+            en: {
+                welcome: 'Welcome !',
+                recharge: 'Recharge',
+                option: 'Option',
+                contract: 'Contract',
+                invite: 'Invite',
+                borrow: 'Borrow',
+                market: 'Market',
+                home: 'Home',
+                wallet: 'Wallet'
+            }
+        };
+
+        let currentLanguage = 'zh';
+
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateAllPrices();
+            updateVerificationButton();
+            
+            // 每5秒更新价格
+            setInterval(updateAllPrices, 5000);
+            
+            // 绑定导航事件
+            bindNavEvents();
+            
+            // 绑定点击外部关闭下拉菜单
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.language-btn') && !e.target.closest('#languageDropdown')) {
+                    document.getElementById('languageDropdown').style.display = 'none';
+                }
+                if (!e.target.closest('#verificationModal')) {
+                    if (e.target === document.getElementById('verificationModal')) {
+                        closeVerification();
+                    }
+                }
+            });
+        });
+
+        // 更新认证按钮状态
+        function updateVerificationButton() {
+            const verifyBtn = document.querySelector('.verify-btn');
+            const verifyIcon = verifyBtn.querySelector('i');
+            
+            verifyBtn.className = `verify-btn ${verificationState.status}`;
+            
+            switch(verificationState.status) {
+                case 'unverified':
+                    verifyIcon.className = 'fas fa-exclamation-triangle';
+                    break;
+                case 'pending':
+                    verifyIcon.className = 'fas fa-clock';
+                    break;
+                case 'verified':
+                    verifyIcon.className = 'fas fa-check-circle';
+                    break;
+                case 'rejected':
+                    verifyIcon.className = 'fas fa-times-circle';
+                    break;
+            }
+        }
+
+        // 更新认证状态显示
+        function updateVerificationStatus() {
+            const statusDiv = document.getElementById('verificationStatus');
+            const form = document.getElementById('verificationForm');
+            
+            statusDiv.className = `verification-status status-${verificationState.status}`;
+            
+            const statusConfig = {
+                unverified: {
+                    icon: 'fas fa-exclamation-triangle',
+                    text: '未认证',
+                    desc: '您需要完成身份认证才能开始交易',
+                    showForm: true
+                },
+                pending: {
+                    icon: 'fas fa-clock',
+                    text: '审核中',
+                    desc: '您的身份认证正在审核中，请耐心等待管理员审核通过',
+                    showForm: false
+                },
+                verified: {
+                    icon: 'fas fa-check-circle',
+                    text: '已认证',
+                    desc: '恭喜！您的身份认证已通过，现在可以正常交易了',
+                    showForm: false
+                },
+                rejected: {
+                    icon: 'fas fa-times-circle',
+                    text: '认证失败',
+                    desc: '很抱歉，您的身份认证未通过。请检查信息后重新提交',
+                    showForm: true
+                }
+            };
+            
+            const config = statusConfig[verificationState.status];
+            statusDiv.innerHTML = `
+                <div class="status-icon">
+                    <i class="${config.icon}"></i>
+                </div>
+                <div class="status-text">${config.text}</div>
+                <div class="status-desc">${config.desc}</div>
+            `;
+            
+            form.style.display = config.showForm ? 'block' : 'none';
+        }
+
+        // 身份认证相关函数
+        function showVerification() {
+            updateVerificationStatus();
+            document.getElementById('verificationModal').style.display = 'block';
+        }
+
+        function closeVerification() {
+            document.getElementById('verificationModal').style.display = 'none';
+        }
+
+        function triggerFileInput(fileId) {
+            document.getElementById(fileId).click();
+        }
+
+        function handleFileSelect(input, type) {
+            const file = input.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('文件大小不能超过5MB');
+                    return;
+                }
+                
+                if (!file.type.startsWith('image/')) {
+                    alert('只支持图片格式');
+                    return;
+                }
+                
+                verificationState[type + 'File'] = file;
+                document.getElementById(type + 'FileName').textContent = file.name;
+                document.getElementById(type + 'Preview').style.display = 'block';
+                document.getElementById(type + 'Upload').style.display = 'none';
+            }
+        }
+
+        function removeFile(type) {
+            verificationState[type + 'File'] = null;
+            document.getElementById(type + 'File').value = '';
+            document.getElementById(type + 'Preview').style.display = 'none';
+            document.getElementById(type + 'Upload').style.display = 'block';
+        }
+
+        function submitVerification() {
+            const realName = document.getElementById('realName').value;
+            const idNumber = document.getElementById('idNumber').value;
+            
+            if (!realName) {
+                alert('请输入真实姓名');
+                return;
+            }
+            
+            if (!idNumber) {
+                alert('请输入身份证号码');
+                return;
+            }
+            
+            if (!verificationState.frontFile) {
+                alert('请上传身份证正面照片');
+                return;
+            }
+            
+            if (!verificationState.backFile) {
+                alert('请上传身份证反面照片');
+                return;
+            }
+            
+            if (!verificationState.handFile) {
+                alert('请上传手持身份证照片');
+                return;
+            }
+            
+            // 模拟提交
+            const submitBtn = document.getElementById('submitVerificationBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '提交中...';
+            
+            setTimeout(() => {
+                verificationState.status = 'pending';
+                updateVerificationButton();
+                updateVerificationStatus();
+                alert('身份认证申请已提交！\n\n我们将在1-3个工作日内完成审核，\n请保持手机畅通，审核结果会及时通知您。');
+                closeVerification();
+                submitBtn.disabled = false;
+                submitBtn.textContent = '提交审核';
+                
+                // 清空表单
+                document.getElementById('realName').value = '';
+                document.getElementById('idNumber').value = '';
+                removeFile('front');
+                removeFile('back');
+                removeFile('hand');
+            }, 2000);
+        }
+
+        // 语言选择相关函数
+        function showLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function setLanguage(language) {
+            currentLanguage = language;
+            
+            // 更新界面文本
+            updateLanguageTexts();
+            
+            // 更新下拉菜单选中状态
+            document.querySelectorAll('.language-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            event.target.closest('.language-item').classList.add('active');
+            
+            // 关闭下拉菜单
+            document.getElementById('languageDropdown').style.display = 'none';
+            
+            const languageNames = {
+                'zh': '简体中文',
+                'en': 'English',
+                'tr': 'Türkçe',
+                'de': 'Deutsch',
+                'ja': '日本語',
+                'it': 'Italiano',
+                'ar': 'العربية',
+                'ko': '한국어',
+                'es': 'Español',
+                'fr': 'Français'
+            };
+            
+            alert(`语言已切换为：${languageNames[language] || language}`);
+        }
+
+        function updateLanguageTexts() {
+            // 这里可以实现界面文本的多语言切换
+            // 暂时保持英文界面，因为设计图是英文的
+        }
+
+        // 检查交易权限
+        function checkTradingPermission() {
+            if (verificationState.status !== 'verified') {
+                alert('您需要完成身份认证才能开始交易！\n\n请点击右上角的感叹号按钮完成身份认证。');
+                showVerification();
+                return false;
+            }
+            return true;
+        }
+
+        // 更新所有价格显示
+        function updateAllPrices() {
+            // 模拟价格变化
+            Object.keys(priceData).forEach(symbol => {
+                const data = priceData[symbol];
+                
+                // 小幅价格变化
+                const changePercent = (Math.random() - 0.5) * 0.01; // 1%范围内变化
+                data.price *= (1 + changePercent);
+                if (data.usd) data.usd *= (1 + changePercent);
+                if (data.marketPrice) data.marketPrice *= (1 + changePercent);
+                
+                // 变化百分比在小范围内波动
+                data.change += (Math.random() - 0.5) * 0.5;
+            });
+            
+            // 更新价格区域显示
+            updatePriceSection();
+            
+            // 更新市场列表显示
+            updateMarketList();
+        }
+
+        // 更新价格区域
+        function updatePriceSection() {
+            ['BTC', 'ETH', 'LTC'].forEach(symbol => {
+                const data = priceData[symbol];
+                const lowerSymbol = symbol.toLowerCase();
+                
+                // 更新主价格
+                const priceElement = document.getElementById(lowerSymbol + 'Price');
+                if (priceElement) {
+                    priceElement.textContent = data.price.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                }
+                
+                // 更新USD价格
+                const usdElement = document.getElementById(lowerSymbol + 'Usd');
+                if (usdElement && data.usd) {
+                    usdElement.textContent = '$' + data.usd.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                }
+                
+                // 更新变化百分比
+                const changeElement = document.getElementById(lowerSymbol + 'Change');
+                if (changeElement) {
+                    changeElement.textContent = (data.change >= 0 ? '+' : '') + data.change.toFixed(2) + '%';
+                    changeElement.className = 'price-change ' + (data.change >= 0 ? 'price-up' : 'price-down');
+                }
+            });
+        }
+
+        // 更新市场列表
+        function updateMarketList() {
+            // XAUT
+            document.getElementById('xautPrice').textContent = priceData.XAUT.price.toFixed(3);
+            document.getElementById('xautChange').textContent = '+' + priceData.XAUT.change.toFixed(2) + '%';
+            document.getElementById('xautAmount').textContent = priceData.XAUT.amount;
+            
+            // BTC Market
+            document.getElementById('btcMarketPrice').textContent = priceData.BTC.marketPrice.toFixed(2);
+            document.getElementById('btcMarketChange').textContent = priceData.BTC.change.toFixed(2) + '%';
+            document.getElementById('btcAmount').textContent = priceData.BTC.amount;
+            
+            // ETH Market
+            document.getElementById('ethMarketPrice').textContent = priceData.ETH.marketPrice.toFixed(2);
+            document.getElementById('ethMarketChange').textContent = priceData.ETH.change.toFixed(2) + '%';
+        }
+
+        // 导航功能（增加权限检查）
+        function goToTrade() {
+            if (checkTradingPermission()) {
+                window.open('trading_demo.html', '_blank');
+            }
+        }
+
+        function goToMarket() {
+            window.open('market_demo.html', '_blank');
+        }
+
+        function goToContract() {
+            if (checkTradingPermission()) {
+                window.open('contract_demo.html', '_blank');
+            }
+        }
+
+        function goToWallet() {
+            window.open('wallet_demo.html', '_blank');
+        }
+
+        function goToTradeWithSymbol(symbol) {
+            if (checkTradingPermission()) {
+                alert(`即将进入 ${symbol} 交易页面`);
+                window.open('trading_demo.html', '_blank');
+            }
+        }
+
+        function showInvite() {
+            alert('邀请功能开发中...\n\n邀请好友注册可获得：\n• 20% 交易手续费返佣\n• 好友首次充值奖励\n• 专属邀请码生成');
+        }
+
+        function showBorrow() {
+            alert('借贷功能开发中...\n\n即将推出：\n• 质押挖矿\n• 借贷理财\n• 流动性挖矿\n• 收益农场');
+        }
+
+        // 绑定导航事件
+        function bindNavEvents() {
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (!this.classList.contains('active') && !this.classList.contains('option-active')) {
+                        document.querySelectorAll('.bottom-nav .nav-item').forEach(nav => {
+                            nav.classList.remove('active');
+                            nav.classList.remove('option-active');
+                        });
+                        
+                        // Option按钮使用特殊颜色
+                        if (this.querySelector('span').textContent === 'Option') {
+                            this.classList.add('option-active');
+                        } else {
+                            this.classList.add('active');
+                        }
+                    }
+                });
+            });
+        }
+
+        // 模拟管理员审核（开发测试用）
+        function simulateAdminApproval() {
+            if (verificationState.status === 'pending') {
+                verificationState.status = 'verified';
+                updateVerificationButton();
+                alert('管理员已通过您的身份认证！现在可以正常交易了。');
+            }
+        }
+
+        function simulateAdminRejection() {
+            if (verificationState.status === 'pending') {
+                verificationState.status = 'rejected';
+                updateVerificationButton();
+                alert('管理员拒绝了您的身份认证，请重新提交。');
+            }
+        }
+
+        // 开发测试快捷键
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+                simulateAdminApproval();
+            }
+            if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+                simulateAdminRejection();
+            }
+        });
+    </script>
+</body>
+</html> 

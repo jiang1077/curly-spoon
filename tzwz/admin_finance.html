@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoinBit - 财务管理</title>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f6fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        /* 页面布局 */
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 左侧导航栏 */
+        .sidebar {
+            width: 260px;
+            background: #2c3e50;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #34495e;
+        }
+
+        .sidebar-brand {
+            color: #3498db;
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 25px;
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #34495e;
+            color: #3498db;
+            border-left-color: #3498db;
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            min-height: 100vh;
+            background: #f5f6fa;
+        }
+
+        /* 顶部导航栏 */
+        .navbar {
+            background: #ffffff;
+            border-bottom: 1px solid #e0e6ed;
+            padding: 0 30px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-left h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #7f8c8d;
+        }
+
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        /* 内容区域 */
+        .content-area {
+            padding: 30px;
+        }
+
+        /* 页面标题 */
+        .page-header {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .page-desc {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+
+        /* 功能模块布局 */
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .module-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .module-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .module-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .module-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .module-content {
+            padding: 25px;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 5px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #27ae60;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        /* 审核列表 */
+        .audit-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .audit-table th,
+        .audit-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .audit-table th {
+            background: #f8f9fa;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .audit-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+        }
+
+        .status-approved {
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+
+        .status-rejected {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        /* 证件图片缩略图 */
+        .cert-thumbnail {
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid #ecf0f1;
+            transition: all 0.3s ease;
+        }
+
+        .cert-thumbnail:hover {
+            border-color: #3498db;
+            transform: scale(1.1);
+        }
+
+        /* 地址列表 */
+        .address-list {
+            background: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .address-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        .address-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .address-info {
+            flex: 1;
+        }
+
+        .address-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .address-value {
+            color: #7f8c8d;
+            font-family: monospace;
+            font-size: 13px;
+            word-break: break-all;
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+
+        /* 证件图片查看 */
+        .cert-viewer {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .cert-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* 时间显示 */
+        .time-display {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #3498db;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .sidebar-brand span {
+                display: none;
+            }
+
+            .nav-link span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+
+            .navbar {
+                padding: 0 15px;
+            }
+
+            .content-area {
+                padding: 15px;
+            }
+
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .audit-table {
+                font-size: 12px;
+            }
+
+            .audit-table th,
+            .audit-table td {
+                padding: 8px 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- 左侧导航栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <i class="fas fa-chart-line"></i>
+                    <span>CoinBit</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-item">
+                    <a href="admin_permissions.html" class="nav-link">
+                        <i class="fas fa-user-shield"></i>
+                        <span>权限管理</span>
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a href="admin_users.html" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        <span>用户管理</span>
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a href="admin_finance.html" class="nav-link active">
+                        <i class="fas fa-wallet"></i>
+                        <span>财务管理</span>
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a href="admin_orders.html" class="nav-link">
+                        <i class="fas fa-list-alt"></i>
+                        <span>订单管理</span>
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a href="admin_plugins.html" class="nav-link">
+                        <i class="fas fa-puzzle-piece"></i>
+                        <span>插件管理</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 主要内容区域 -->
+        <main class="main-content">
+            <!-- 顶部导航栏 -->
+            <nav class="navbar">
+                <div class="navbar-left">
+                    <h1>财务管理</h1>
+                </div>
+                <div class="navbar-right">
+                    <div class="admin-info">
+                        <div class="admin-avatar">A</div>
+                        <span>超级管理员</span>
+                    </div>
+                    <button class="logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        退出
+                    </button>
+                </div>
+            </nav>
+
+            <!-- 内容区域 -->
+            <div class="content-area">
+                <!-- 页面标题 -->
+                <div class="page-header">
+                    <h2 class="page-title">财务管理</h2>
+                    <p class="page-desc">管理充值地址、审核用户证件和处理充值提现申请</p>
+                </div>
+
+                <!-- 功能模块 -->
+                <div class="modules-grid">
+                    <!-- 1. 充值地址管理 -->
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <div>
+                                <div class="module-title">充值地址管理</div>
+                                <div style="font-size: 14px; opacity: 0.9;">USDT TRC20 充值地址配置</div>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <form id="addressForm">
+                                <div class="form-group">
+                                    <label class="form-label">主要充值地址</label>
+                                    <input type="text" class="form-input" id="mainAddress" 
+                                           value="TQrZ9wBk8A1ABCD1234567890EFGHIJklmno" 
+                                           placeholder="输入USDT TRC20地址">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">备用充值地址</label>
+                                    <input type="text" class="form-input" id="backupAddress" 
+                                           value="TPqX8vCj9B2XYZA9876543210QRSTUVwxyz" 
+                                           placeholder="输入备用地址">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">地址状态</label>
+                                    <select class="form-select" id="addressStatus">
+                                        <option value="active">启用</option>
+                                        <option value="inactive">禁用</option>
+                                        <option value="maintenance">维护中</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    保存地址设置
+                                </button>
+                            </form>
+                            
+                            <div class="address-list">
+                                <div class="address-item">
+                                    <div class="address-info">
+                                        <div class="address-label">当前主地址</div>
+                                        <div class="address-value">TQrZ9wBk8A1ABCD1234567890EFGHIJklmno</div>
+                                    </div>
+                                    <button class="btn btn-warning" onclick="copyAddress('main')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <div class="address-item">
+                                    <div class="address-info">
+                                        <div class="address-label">备用地址</div>
+                                        <div class="address-value">TPqX8vCj9B2XYZA9876543210QRSTUVwxyz</div>
+                                    </div>
+                                    <button class="btn btn-warning" onclick="copyAddress('backup')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. 证件审核 -->
+                    <div class="module-card">
+                        <div class="module-header">
+                            <div class="module-icon">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+                            <div>
+                                <div class="module-title">证件审核</div>
+                                <div style="font-size: 14px; opacity: 0.9;">用户身份证件验证审核</div>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div style="margin-bottom: 15px;">
+                                <span style="color: #f39c12; font-weight: 600;">
+                                    <i class="fas fa-clock"></i>
+                                    待审核证件：5个
+                                </span>
+                            </div>
+                            
+                            <table class="audit-table">
+                                <thead>
+                                    <tr>
+                                        <th>用户</th>
+                                        <th>证件类型</th>
+                                        <th>证件图片</th>
+                                        <th>状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="certAuditBody">
+                                    <!-- 证件审核数据将由JavaScript生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. 充值提现审核 (全宽模块) -->
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <div>
+                            <div class="module-title">充值提现审核</div>
+                            <div style="font-size: 14px; opacity: 0.9;">审核用户充值确认和提现申请</div>
+                        </div>
+                    </div>
+                    <div class="module-content">
+                        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; font-weight: bold; color: #3498db;">12</div>
+                                <div style="color: #7f8c8d; font-size: 14px;">待确认充值</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; font-weight: bold; color: #f39c12;">8</div>
+                                <div style="color: #7f8c8d; font-size: 14px;">待审核提现</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; font-weight: bold; color: #2ecc71;">156</div>
+                                <div style="color: #7f8c8d; font-size: 14px;">今日处理</div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                            <select class="form-select" id="transactionTypeFilter" style="width: auto;" onchange="filterTransactions()">
+                                <option value="">全部类型</option>
+                                <option value="deposit">充值</option>
+                                <option value="withdraw">提现</option>
+                            </select>
+                            <select class="form-select" id="transactionStatusFilter" style="width: auto;" onchange="filterTransactions()">
+                                <option value="">全部状态</option>
+                                <option value="pending">待审核</option>
+                                <option value="approved">已通过</option>
+                                <option value="rejected">已拒绝</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="refreshTransactions()">
+                                <i class="fas fa-sync-alt"></i>
+                                刷新列表
+                            </button>
+                        </div>
+
+                        <table class="audit-table">
+                            <thead>
+                                <tr>
+                                    <th>交易ID</th>
+                                    <th>用户</th>
+                                    <th>类型</th>
+                                    <th>金额</th>
+                                    <th>地址/银行</th>
+                                    <th>状态</th>
+                                    <th>申请时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionAuditBody">
+                                <!-- 充值提现审核数据将由JavaScript生成 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 证件查看模态框 -->
+    <div class="modal" id="certViewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="certModalTitle">查看证件</h3>
+            </div>
+            
+            <div class="cert-viewer">
+                <img id="certImage" class="cert-image" src="" alt="证件图片">
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <div><strong>用户：</strong><span id="certUser"></span></div>
+                <div><strong>证件类型：</strong><span id="certType"></span></div>
+                <div><strong>上传时间：</strong><span id="certTime"></span></div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn btn-danger" onclick="rejectCert()">
+                    <i class="fas fa-times"></i>
+                    拒绝
+                </button>
+                <button class="btn btn-success" onclick="approveCert()">
+                    <i class="fas fa-check"></i>
+                    通过
+                </button>
+                <button class="btn btn-primary" onclick="closeCertModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 交易审核模态框 -->
+    <div class="modal" id="transactionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="transactionModalTitle">交易审核</h3>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <div class="form-group">
+                    <label class="form-label">交易ID</label>
+                    <input type="text" class="form-input" id="transactionId" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">用户名</label>
+                    <input type="text" class="form-input" id="transactionUser" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">交易金额</label>
+                    <input type="text" class="form-input" id="transactionAmount" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">审核备注</label>
+                    <textarea class="form-input" id="auditNotes" rows="3" placeholder="添加审核备注..."></textarea>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn btn-danger" onclick="rejectTransaction()">
+                    <i class="fas fa-times"></i>
+                    拒绝
+                </button>
+                <button class="btn btn-success" onclick="approveTransaction()">
+                    <i class="fas fa-check"></i>
+                    通过
+                </button>
+                <button class="btn btn-primary" onclick="closeTransactionModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 时间显示 -->
+    <div class="time-display" id="timeDisplay">
+        <i class="fas fa-clock"></i>
+        <span id="currentTime"></span>
+    </div>
+
+    <script>
+        // 模拟证件审核数据
+        let certAuditData = [
+            {
+                id: 1,
+                username: 'user001',
+                certType: '身份证',
+                imageUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPklEIENhcmQ8L3RleHQ+PC9zdmc+',
+                status: 'pending',
+                uploadTime: '2024-12-24 14:30:00'
+            },
+            {
+                id: 2,
+                username: 'trader123',
+                certType: '护照',
+                imageUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlBhc3Nwb3J0PC90ZXh0Pjwvc3ZnPg==',
+                status: 'pending',
+                uploadTime: '2024-12-24 15:45:00'
+            }
+        ];
+
+        // 模拟充值提现审核数据
+        let transactionData = [
+            {
+                id: 'DEP202412240001',
+                username: 'user001',
+                type: 'deposit',
+                amount: 1000.00,
+                address: 'TQrZ9wBk8A1ABCD1234567890EFGHIJklmno',
+                status: 'pending',
+                createTime: '2024-12-24 16:20:00',
+                notes: ''
+            },
+            {
+                id: 'WTH202412240002',
+                username: 'trader123',
+                type: 'withdraw',
+                amount: 500.00,
+                address: '中国银行 **** 8888',
+                status: 'pending',
+                createTime: '2024-12-24 17:10:00',
+                notes: ''
+            }
+        ];
+
+        let currentCertId = null;
+        let currentTransactionId = null;
+
+        // 初始化页面
+        window.addEventListener('load', function() {
+            loadCertAuditTable();
+            loadTransactionAuditTable();
+            updateTime();
+            setInterval(updateTime, 1000);
+        });
+
+        // 加载证件审核表格
+        function loadCertAuditTable() {
+            const tableBody = document.getElementById('certAuditBody');
+            
+            tableBody.innerHTML = certAuditData.map(cert => `
+                <tr>
+                    <td>${cert.username}</td>
+                    <td>${cert.certType}</td>
+                    <td>
+                        <img src="${cert.imageUrl}" class="cert-thumbnail" 
+                             onclick="viewCert(${cert.id})" alt="证件缩略图">
+                    </td>
+                    <td>
+                        <span class="status-badge status-${cert.status}">
+                            ${cert.status === 'pending' ? '待审核' : 
+                              cert.status === 'approved' ? '已通过' : '已拒绝'}
+                        </span>
+                    </td>
+                    <td>
+                        ${cert.status === 'pending' ? `
+                            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;" onclick="viewCert(${cert.id})">
+                                <i class="fas fa-eye"></i>
+                                审核
+                            </button>
+                        ` : '-'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 加载交易审核表格
+        function loadTransactionAuditTable() {
+            const tableBody = document.getElementById('transactionAuditBody');
+            
+            tableBody.innerHTML = transactionData.map(trans => `
+                <tr>
+                    <td><code>${trans.id}</code></td>
+                    <td>${trans.username}</td>
+                    <td>
+                        <span class="status-badge ${trans.type === 'deposit' ? 'status-approved' : 'status-pending'}">
+                            ${trans.type === 'deposit' ? '充值' : '提现'}
+                        </span>
+                    </td>
+                    <td style="font-weight: 600;">$${trans.amount.toFixed(2)}</td>
+                    <td style="font-size: 12px; max-width: 150px; overflow: hidden; text-overflow: ellipsis;">${trans.address}</td>
+                    <td>
+                        <span class="status-badge status-${trans.status}">
+                            ${trans.status === 'pending' ? '待审核' : 
+                              trans.status === 'approved' ? '已通过' : '已拒绝'}
+                        </span>
+                    </td>
+                    <td>${trans.createTime}</td>
+                    <td>
+                        ${trans.status === 'pending' ? `
+                            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;" onclick="auditTransaction('${trans.id}')">
+                                <i class="fas fa-gavel"></i>
+                                审核
+                            </button>
+                        ` : '-'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 查看证件
+        function viewCert(certId) {
+            const cert = certAuditData.find(c => c.id === certId);
+            if (cert) {
+                currentCertId = certId;
+                document.getElementById('certImage').src = cert.imageUrl;
+                document.getElementById('certUser').textContent = cert.username;
+                document.getElementById('certType').textContent = cert.certType;
+                document.getElementById('certTime').textContent = cert.uploadTime;
+                document.getElementById('certViewModal').classList.add('show');
+            }
+        }
+
+        // 审核交易
+        function auditTransaction(transactionId) {
+            const transaction = transactionData.find(t => t.id === transactionId);
+            if (transaction) {
+                currentTransactionId = transactionId;
+                document.getElementById('transactionId').value = transaction.id;
+                document.getElementById('transactionUser').value = transaction.username;
+                document.getElementById('transactionAmount').value = `$${transaction.amount.toFixed(2)} (${transaction.type === 'deposit' ? '充值' : '提现'})`;
+                document.getElementById('auditNotes').value = '';
+                document.getElementById('transactionModal').classList.add('show');
+            }
+        }
+
+        // 通过证件审核
+        function approveCert() {
+            if (currentCertId) {
+                const certIndex = certAuditData.findIndex(c => c.id === currentCertId);
+                if (certIndex !== -1) {
+                    certAuditData[certIndex].status = 'approved';
+                    loadCertAuditTable();
+                    closeCertModal();
+                    alert('证件审核通过！');
+                }
+            }
+        }
+
+        // 拒绝证件审核
+        function rejectCert() {
+            if (currentCertId && confirm('确认拒绝该证件审核？')) {
+                const certIndex = certAuditData.findIndex(c => c.id === currentCertId);
+                if (certIndex !== -1) {
+                    certAuditData[certIndex].status = 'rejected';
+                    loadCertAuditTable();
+                    closeCertModal();
+                    alert('证件审核已拒绝！');
+                }
+            }
+        }
+
+        // 通过交易审核
+        function approveTransaction() {
+            if (currentTransactionId) {
+                const transIndex = transactionData.findIndex(t => t.id === currentTransactionId);
+                if (transIndex !== -1) {
+                    transactionData[transIndex].status = 'approved';
+                    transactionData[transIndex].notes = document.getElementById('auditNotes').value;
+                    loadTransactionAuditTable();
+                    closeTransactionModal();
+                    alert('交易审核通过！');
+                }
+            }
+        }
+
+        // 拒绝交易审核
+        function rejectTransaction() {
+            if (currentTransactionId && confirm('确认拒绝该交易申请？')) {
+                const transIndex = transactionData.findIndex(t => t.id === currentTransactionId);
+                if (transIndex !== -1) {
+                    transactionData[transIndex].status = 'rejected';
+                    transactionData[transIndex].notes = document.getElementById('auditNotes').value;
+                    loadTransactionAuditTable();
+                    closeTransactionModal();
+                    alert('交易申请已拒绝！');
+                }
+            }
+        }
+
+        // 关闭证件模态框
+        function closeCertModal() {
+            document.getElementById('certViewModal').classList.remove('show');
+            currentCertId = null;
+        }
+
+        // 关闭交易模态框
+        function closeTransactionModal() {
+            document.getElementById('transactionModal').classList.remove('show');
+            currentTransactionId = null;
+        }
+
+        // 复制地址
+        function copyAddress(type) {
+            const address = type === 'main' ? 
+                'TQrZ9wBk8A1ABCD1234567890EFGHIJklmno' : 
+                'TPqX8vCj9B2XYZA9876543210QRSTUVwxyz';
+            
+            navigator.clipboard.writeText(address).then(() => {
+                alert('地址已复制到剪贴板！');
+            });
+        }
+
+        // 保存地址设置
+        document.getElementById('addressForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('充值地址设置已保存！');
+        });
+
+        // 筛选交易
+        function filterTransactions() {
+            // 实现筛选逻辑
+            loadTransactionAuditTable();
+        }
+
+        // 刷新交易列表
+        function refreshTransactions() {
+            loadTransactionAuditTable();
+            alert('交易列表已刷新！');
+        }
+
+        // 更新时间显示
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('currentTime').textContent = timeString;
+        }
+
+        // 退出登录
+        function logout() {
+            if (confirm('确认退出管理系统？')) {
+                alert('已安全退出管理系统');
+                window.location.href = 'admin_dashboard_test.html';
+            }
+        }
+
+        // 点击模态框外部关闭
+        document.getElementById('certViewModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCertModal();
+            }
+        });
+
+        document.getElementById('transactionModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeTransactionModal();
+            }
+        });
+    </script>
+</body>
+</html> 

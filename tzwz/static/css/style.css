@@ -1,0 +1,491 @@
+/* CoinBit交易平台样式 */
+/* 根据规划文档：简洁、流畅、稳定的设计理念 */
+
+/* ===== 全局变量 ===== */
+:root {
+    --primary-color: #FF9500;      /* 主色：橙色 */
+    --secondary-color: #25D366;    /* 辅色：WhatsApp绿 */
+    --bg-dark: #1a1a1a;          /* 深色背景 */
+    --bg-card: #2d2d2d;          /* 卡片背景 */
+    --text-primary: #ffffff;      /* 主要文字 */
+    --text-secondary: #888888;    /* 次要文字 */
+    --success-color: #4CAF50;     /* 成功：绿色 */
+    --danger-color: #F44336;      /* 失败：红色 */
+    --warning-color: #FF9800;     /* 警告：橙色 */
+    --info-color: #2196F3;        /* 信息：蓝色 */
+    --border-color: #404040;      /* 边框颜色 */
+}
+
+/* ===== 全局样式 ===== */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--bg-dark) !important;
+    color: var(--text-primary) !important;
+    line-height: 1.6;
+    padding-bottom: 80px; /* 为底部导航留空间 */
+}
+
+.text-primary-custom {
+    color: var(--primary-color) !important;
+}
+
+.bg-card {
+    background-color: var(--bg-card) !important;
+}
+
+/* ===== 导航栏样式 ===== */
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: var(--primary-color) !important;
+}
+
+/* ===== 按钮样式 ===== */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    font-weight: 500;
+}
+
+.btn-primary:hover {
+    background-color: #e6860a;
+    border-color: #e6860a;
+}
+
+.btn-success {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+/* ===== 卡片样式 ===== */
+.card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+}
+
+.card-header {
+    background-color: rgba(255, 149, 0, 0.1);
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 600;
+}
+
+/* ===== 表单样式 ===== */
+.form-control {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 8px;
+}
+
+.form-control:focus {
+    background-color: var(--bg-card);
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 0.2rem rgba(255, 149, 0, 0.25);
+}
+
+.form-label {
+    color: var(--primary-color);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+/* ===== WhatsApp客服悬浮按钮 ===== */
+.whatsapp-float {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 100px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.whatsapp-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: var(--secondary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 24px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    animation: pulse 2s infinite;
+}
+
+.whatsapp-btn:hover {
+    background-color: #128c7e;
+    color: white;
+    transform: scale(1.1);
+    text-decoration: none;
+}
+
+.whatsapp-text {
+    display: none;
+    position: absolute;
+    right: 70px;
+    background: var(--bg-card);
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    white-space: nowrap;
+    border: 1px solid var(--border-color);
+}
+
+.whatsapp-btn:hover .whatsapp-text {
+    display: block;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(37, 211, 102, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+    }
+}
+
+/* ===== 底部导航（移动端） ===== */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--bg-card);
+    border-top: 1px solid var(--border-color);
+    padding: 10px 0;
+    z-index: 999;
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 12px;
+    transition: color 0.3s ease;
+}
+
+.bottom-nav-item:hover,
+.bottom-nav-item.active {
+    color: var(--primary-color);
+}
+
+.bottom-nav-item i {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+/* ===== 交易相关样式 ===== */
+.trading-card {
+    background: linear-gradient(135deg, var(--bg-card) 0%, #333333 100%);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.price-display {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(255, 149, 0, 0.1);
+    border: 1px solid var(--primary-color);
+}
+
+.price-up {
+    color: var(--success-color);
+}
+
+.price-down {
+    color: var(--danger-color);
+}
+
+/* 期权时间按钮 */
+.option-time-btn {
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin: 5px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.option-time-btn.active {
+    border-color: var(--primary-color);
+    background-color: rgba(255, 149, 0, 0.2);
+}
+
+.option-time-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* 交易方向按钮 */
+.direction-btn {
+    height: 60px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.direction-btn.up {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.direction-btn.down {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+.direction-btn:hover {
+    transform: scale(1.05);
+}
+
+/* ===== 钱包相关样式 ===== */
+.balance-card {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #cc7700 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+}
+
+.balance-amount {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+/* ===== 订单列表样式 ===== */
+.order-item {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.order-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 8px rgba(255, 149, 0, 0.2);
+}
+
+.order-status {
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.order-status.win {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.order-status.lose {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.order-status.pending {
+    background-color: var(--warning-color);
+    color: white;
+}
+
+/* ===== 表格样式 ===== */
+.table-dark {
+    --bs-table-bg: var(--bg-card);
+    --bs-table-border-color: var(--border-color);
+}
+
+.table-dark th {
+    border-bottom: 2px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+/* ===== 二维码样式 ===== */
+.qr-code-container {
+    text-align: center;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    display: inline-block;
+    margin: 20px 0;
+}
+
+/* ===== 加载动画 ===== */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 149, 0, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ===== 响应式设计 ===== */
+@media (max-width: 768px) {
+    .whatsapp-float {
+        bottom: 120px;
+        right: 15px;
+    }
+    
+    .whatsapp-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .price-display {
+        font-size: 1.5rem;
+    }
+    
+    .balance-amount {
+        font-size: 2rem;
+    }
+    
+    .card {
+        margin-bottom: 15px;
+    }
+    
+    .option-time-btn {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    .price-display {
+        font-size: 1.2rem;
+        padding: 10px;
+    }
+    
+    .balance-amount {
+        font-size: 1.8rem;
+    }
+    
+    .direction-btn {
+        height: 50px;
+        font-size: 1rem;
+    }
+}
+
+/* ===== 滚动条样式 ===== */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
+
+/* ===== 动画效果 ===== */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.scale-in {
+    animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* ===== 实用工具类 ===== */
+.text-orange {
+    color: var(--primary-color) !important;
+}
+
+.bg-orange {
+    background-color: var(--primary-color) !important;
+}
+
+.border-orange {
+    border-color: var(--primary-color) !important;
+}
+
+.shadow-orange {
+    box-shadow: 0 4px 8px rgba(255, 149, 0, 0.3) !important;
+}
+
+/* ===== 特殊效果 ===== */
+.glow {
+    box-shadow: 0 0 20px rgba(255, 149, 0, 0.5);
+}
+
+.pulse-orange {
+    animation: pulseOrange 2s infinite;
+}
+
+@keyframes pulseOrange {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 149, 0, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(255, 149, 0, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 149, 0, 0);
+    }
+} 

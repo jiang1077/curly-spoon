@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShareOption - 钱包</title>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(180deg, #1a1a1a 0%, #000000 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        /* 顶部标题栏 */
+        .header {
+            background: #1a1a1a;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .header-title {
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .settings-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: #2a2a2a;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .settings-btn:hover {
+            background: #404040;
+            color: #ffffff;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            height: calc(100vh - 60px - 80px);
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* 余额卡片 */
+        .balance-card {
+            background: linear-gradient(135deg, #00C851, #007E33);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .balance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .balance-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .eye-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .total-balance {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .balance-usd {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* 功能菜单 */
+        .feature-menu {
+            background: #2a2a2a;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #404040;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-item:hover {
+            background: #404040;
+        }
+
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 18px;
+        }
+
+        .deposit-icon { background: linear-gradient(135deg, #00C851, #007E33); }
+        .withdraw-icon { background: linear-gradient(135deg, #ff4444, #cc1100); }
+
+        .menu-content {
+            flex: 1;
+        }
+
+        .menu-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .menu-desc {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .menu-arrow {
+            color: #888;
+            font-size: 14px;
+        }
+
+        /* 资产列表 */
+        .asset-section {
+            background: #2a2a2a;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #404040;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .asset-list {
+            padding: 0 20px;
+        }
+
+        .asset-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #404040;
+        }
+
+        .asset-item:last-child {
+            border-bottom: none;
+        }
+
+        .asset-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .usdt-icon { background: linear-gradient(135deg, #26a17b, #1e7a5f); }
+
+        .asset-info {
+            flex: 1;
+        }
+
+        .asset-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .asset-desc {
+            font-size: 11px;
+            color: #888;
+        }
+
+        .asset-balance {
+            text-align: right;
+        }
+
+        .balance-amount {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .balance-value {
+            font-size: 11px;
+            color: #888;
+        }
+
+        /* 快速提示 */
+        .quick-tips {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .tip-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ffc107;
+        }
+
+        .tip-content {
+            font-size: 12px;
+            color: #ccc;
+            line-height: 1.4;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            display: flex;
+            background: #1a1a1a;
+            border-top: 1px solid #333;
+            height: 80px;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            text-decoration: none;
+            font-size: 12px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #00C851;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        /* 滚动条样式 */
+        .main-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .main-content::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        .main-content::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 2px;
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #2a2a2a;
+            margin: 50px auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 12px;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            background: #404040;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 12px;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #00C851;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .file-upload {
+            border: 2px dashed #555;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: #00C851;
+            background: #404040;
+        }
+
+        .file-upload.dragover {
+            border-color: #00C851;
+            background: #404040;
+        }
+
+        .upload-icon {
+            font-size: 24px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 4px;
+        }
+
+        .upload-hint {
+            font-size: 11px;
+            color: #888;
+        }
+
+        .file-preview {
+            background: #404040;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .file-name {
+            font-size: 12px;
+            color: #00C851;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #00C851, #007E33);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #007E33, #00C851);
+        }
+
+        .submit-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 480px) {
+            .total-balance {
+                font-size: 32px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部标题栏 -->
+    <div class="header">
+        <div class="header-title">Wallet</div>
+        <button class="settings-btn" onclick="showSettings()">
+            <i class="fas fa-cog"></i>
+        </button>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <div class="main-content">
+        <!-- 余额卡片 -->
+        <div class="balance-card">
+            <div class="balance-header">
+                <div class="balance-label">总资产 (USDT)</div>
+                <button class="eye-btn" id="eyeBtn" onclick="toggleBalanceVisibility()">
+                    <i class="fas fa-eye" id="eyeIcon"></i>
+                </button>
+            </div>
+            <div class="total-balance" id="totalBalance">43,495.00</div>
+            <div class="balance-usd" id="balanceUsd">≈ $43,495.00 USD</div>
+            <div class="action-buttons">
+                <button class="action-btn" onclick="showDepositModal()">
+                    <i class="fas fa-plus"></i>
+                    <span>充值</span>
+                </button>
+                <button class="action-btn" onclick="showWithdrawModal()">
+                    <i class="fas fa-minus"></i>
+                    <span>提现</span>
+                </button>
+                <button class="action-btn" onclick="goToTrade()">
+                    <i class="fas fa-chart-line"></i>
+                    <span>交易</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 功能菜单 -->
+        <div class="feature-menu">
+            <div class="menu-item" onclick="showDepositModal()">
+                <div class="menu-icon deposit-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="menu-content">
+                    <div class="menu-title">充值</div>
+                    <div class="menu-desc">USDT充值，支持多种网络</div>
+                </div>
+                <div class="menu-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+
+            <div class="menu-item" onclick="showWithdrawModal()">
+                <div class="menu-icon withdraw-icon">
+                    <i class="fas fa-minus"></i>
+                </div>
+                <div class="menu-content">
+                    <div class="menu-title">提现</div>
+                    <div class="menu-desc">USDT提现，快速到账</div>
+                </div>
+                <div class="menu-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 资产列表 -->
+        <div class="asset-section">
+            <div class="section-header">
+                <div class="section-title">我的资产</div>
+            </div>
+            <div class="asset-list">
+                <div class="asset-item">
+                    <div class="asset-icon usdt-icon">₮</div>
+                    <div class="asset-info">
+                        <div class="asset-name">USDT</div>
+                        <div class="asset-desc">泰达币</div>
+                    </div>
+                    <div class="asset-balance">
+                        <div class="balance-amount" id="usdtBalance">43,495.00</div>
+                        <div class="balance-value">≈ $43,495.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 快速提示 -->
+        <div class="quick-tips">
+            <div class="tip-title">💡 钱包使用提示</div>
+            <div class="tip-content">
+                • 充值确认时间约5-30分钟，具体以区块链确认为准<br>
+                • 提现最小金额5 USDT，手续费1%<br>
+                • 如有疑问请联系客服支持
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <a href="#" class="nav-item" onclick="goToHome()">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="#" class="nav-item" onclick="goToMarket()">
+            <i class="fas fa-chart-line"></i>
+            <span>Market</span>
+        </a>
+        <a href="#" class="nav-item" onclick="goToContract()">
+            <i class="fas fa-file-contract"></i>
+            <span>Contract</span>
+        </a>
+        <a href="#" class="nav-item" onclick="goToTrade()">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Trade</span>
+        </a>
+        <a href="#" class="nav-item active">
+            <i class="fas fa-wallet"></i>
+            <span>Wallet</span>
+        </a>
+    </div>
+
+    <!-- 充值模态框 -->
+    <div class="modal" id="depositModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">USDT充值</div>
+                <button class="close-btn" onclick="closeModal('depositModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">选择网络</label>
+                    <select class="form-input" id="networkSelect">
+                        <option value="TRC20">TRC20 (推荐，手续费低)</option>
+                        <option value="ERC20">ERC20</option>
+                        <option value="BEP20">BEP20</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">充值地址</label>
+                    <div style="background: #404040; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px; word-break: break-all; position: relative;">
+                        <span id="depositAddress">TQn9Y2khEsLMG73Vs9sAppnxHBHsmqvjN6</span>
+                        <button onclick="copyAddress()" style="position: absolute; right: 8px; top: 8px; background: #00C851; border: none; border-radius: 4px; padding: 4px 8px; color: white; font-size: 10px; cursor: pointer;">
+                            复制
+                        </button>
+                    </div>
+                    <div style="font-size: 11px; color: #888; margin-top: 4px;">
+                        请向此地址转账USDT，确保选择正确的网络
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">充值金额 (USDT)</label>
+                    <input type="number" class="form-input" id="depositAmount" placeholder="请输入充值金额" min="10" step="0.01">
+                    <div style="font-size: 11px; color: #888; margin-top: 4px;">
+                        最小充值金额：10 USDT
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">上传转账凭证 *</label>
+                    <div class="file-upload" id="fileUpload" onclick="triggerFileInput()">
+                        <input type="file" id="depositProof" accept="image/*" style="display: none;" onchange="handleFileSelect(this)">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-text">点击上传或拖拽文件到此处</div>
+                        <div class="upload-hint">支持JPG、PNG格式，最大5MB</div>
+                    </div>
+                    <div class="file-preview" id="filePreview">
+                        <i class="fas fa-file-image" style="color: #00C851; margin-right: 8px;"></i>
+                        <span class="file-name" id="fileName"></span>
+                        <button onclick="removeFile()" style="float: right; background: none; border: none; color: #ff4444; cursor: pointer;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">备注信息 (可选)</label>
+                    <textarea class="form-textarea" id="depositNote" placeholder="请输入备注信息"></textarea>
+                </div>
+            </div>
+            <button class="submit-btn" id="submitDeposit" onclick="confirmDeposit()">提交充值申请</button>
+        </div>
+    </div>
+
+    <!-- 提现模态框 -->
+    <div class="modal" id="withdrawModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">USDT提现</div>
+                <button class="close-btn" onclick="closeModal('withdrawModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">提现网络</label>
+                    <select class="form-input">
+                        <option>TRC20 (推荐，手续费低)</option>
+                        <option>ERC20</option>
+                        <option>BEP20</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">提现地址</label>
+                    <input type="text" class="form-input" id="withdrawAddress" placeholder="请输入USDT提现地址">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">提现金额</label>
+                    <input type="number" class="form-input" id="withdrawAmount" placeholder="最小5 USDT" min="5" max="43495" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">资金密码</label>
+                    <input type="password" class="form-input" id="fundPassword" placeholder="请输入资金密码">
+                </div>
+                
+                <div style="font-size: 12px; color: #888; margin-bottom: 16px; background: #333; padding: 12px; border-radius: 8px;">
+                    <div style="margin-bottom: 4px;">手续费：1%</div>
+                    <div style="margin-bottom: 4px;">可用余额：43,495.00 USDT</div>
+                    <div>预计到账时间：1-24小时</div>
+                </div>
+            </div>
+            <button class="submit-btn" onclick="confirmWithdraw()">确认提现</button>
+        </div>
+    </div>
+
+    <script>
+        let balanceVisible = true;
+        let currentBalance = 43495.00;
+        let selectedFile = null;
+
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateBalanceDisplay();
+            bindNavEvents();
+            setupDragAndDrop();
+        });
+
+        // 切换余额显示/隐藏
+        function toggleBalanceVisibility() {
+            balanceVisible = !balanceVisible;
+            updateBalanceDisplay();
+            
+            const eyeIcon = document.getElementById('eyeIcon');
+            eyeIcon.className = balanceVisible ? 'fas fa-eye' : 'fas fa-eye-slash';
+        }
+
+        // 更新余额显示
+        function updateBalanceDisplay() {
+            const balanceText = balanceVisible ? currentBalance.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) : '****.**';
+            
+            document.getElementById('totalBalance').textContent = balanceText;
+            document.getElementById('balanceUsd').textContent = `≈ $${balanceText} USD`;
+            document.getElementById('usdtBalance').textContent = balanceText;
+        }
+
+        // 显示模态框
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        // 关闭模态框
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            if (modalId === 'depositModal') {
+                resetDepositForm();
+            }
+        }
+
+        // 显示充值模态框
+        function showDepositModal() {
+            showModal('depositModal');
+        }
+
+        // 显示提现模态框
+        function showWithdrawModal() {
+            showModal('withdrawModal');
+        }
+
+        // 复制地址
+        function copyAddress() {
+            const address = document.getElementById('depositAddress').textContent;
+            navigator.clipboard.writeText(address).then(() => {
+                alert('地址已复制到剪贴板');
+            });
+        }
+
+        // 触发文件选择
+        function triggerFileInput() {
+            document.getElementById('depositProof').click();
+        }
+
+        // 处理文件选择
+        function handleFileSelect(input) {
+            const file = input.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('文件大小不能超过5MB');
+                    return;
+                }
+                
+                if (!file.type.startsWith('image/')) {
+                    alert('只支持图片格式');
+                    return;
+                }
+                
+                selectedFile = file;
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('filePreview').style.display = 'block';
+                document.getElementById('fileUpload').style.display = 'none';
+            }
+        }
+
+        // 移除文件
+        function removeFile() {
+            selectedFile = null;
+            document.getElementById('depositProof').value = '';
+            document.getElementById('filePreview').style.display = 'none';
+            document.getElementById('fileUpload').style.display = 'block';
+        }
+
+        // 设置拖拽上传
+        function setupDragAndDrop() {
+            const fileUpload = document.getElementById('fileUpload');
+            
+            fileUpload.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('dragover');
+            });
+            
+            fileUpload.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+            });
+            
+            fileUpload.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    if (file.type.startsWith('image/')) {
+                        document.getElementById('depositProof').files = files;
+                        handleFileSelect(document.getElementById('depositProof'));
+                    } else {
+                        alert('只支持图片格式');
+                    }
+                }
+            });
+        }
+
+        // 重置充值表单
+        function resetDepositForm() {
+            document.getElementById('depositAmount').value = '';
+            document.getElementById('depositNote').value = '';
+            removeFile();
+        }
+
+        // 确认充值
+        function confirmDeposit() {
+            const amount = document.getElementById('depositAmount').value;
+            const network = document.getElementById('networkSelect').value;
+            const note = document.getElementById('depositNote').value;
+            
+            if (!amount || parseFloat(amount) < 10) {
+                alert('充值金额最小为10 USDT');
+                return;
+            }
+            
+            if (!selectedFile) {
+                alert('请上传转账凭证');
+                return;
+            }
+            
+            // 模拟提交
+            const submitBtn = document.getElementById('submitDeposit');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '提交中...';
+            
+            setTimeout(() => {
+                alert(`充值申请已提交！\n\n充值信息：\n网络：${network}\n金额：${amount} USDT\n凭证：${selectedFile.name}\n备注：${note || '无'}\n\n我们将在1-6小时内人工审核并到账。\n请保持手机畅通，如有问题会及时联系您。`);
+                closeModal('depositModal');
+                submitBtn.disabled = false;
+                submitBtn.textContent = '提交充值申请';
+            }, 2000);
+        }
+
+        // 确认提现
+        function confirmWithdraw() {
+            const address = document.getElementById('withdrawAddress').value;
+            const amount = document.getElementById('withdrawAmount').value;
+            const password = document.getElementById('fundPassword').value;
+            
+            if (!address) {
+                alert('请输入提现地址');
+                return;
+            }
+            
+            if (!amount || parseFloat(amount) < 5) {
+                alert('提现金额最小为5 USDT');
+                return;
+            }
+            
+            if (parseFloat(amount) > currentBalance) {
+                alert('余额不足');
+                return;
+            }
+            
+            if (!password) {
+                alert('请输入资金密码');
+                return;
+            }
+            
+            const fee = parseFloat(amount) * 0.01;
+            const actualAmount = parseFloat(amount) - fee;
+            
+            if (confirm(`确认提现 ${amount} USDT？\n手续费：${fee.toFixed(2)} USDT\n实际到账：${actualAmount.toFixed(2)} USDT\n预计1-24小时内到账`)) {
+                currentBalance -= parseFloat(amount);
+                updateBalanceDisplay();
+                alert('提现申请已提交！\n\n我们将在1小时内处理您的提现申请，\n预计1-24小时内到账，请注意查收。');
+                closeModal('withdrawModal');
+                
+                // 清空表单
+                document.getElementById('withdrawAddress').value = '';
+                document.getElementById('withdrawAmount').value = '';
+                document.getElementById('fundPassword').value = '';
+            }
+        }
+
+        // 显示设置
+        function showSettings() {
+            alert('钱包设置开发中...\n\n功能包括：\n• 资金密码设置\n• 地址簿管理\n• 安全设置\n• 通知设置');
+        }
+
+        // 导航功能
+        function goToHome() {
+            window.open('home_demo.html', '_blank');
+        }
+
+        function goToMarket() {
+            window.open('market_demo.html', '_blank');
+        }
+
+        function goToTrade() {
+            window.open('trading_demo.html', '_blank');
+        }
+
+        function goToContract() {
+            window.open('contract_demo.html', '_blank');
+        }
+
+        // 绑定导航事件
+        function bindNavEvents() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (!this.classList.contains('active')) {
+                        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                        this.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modals = ['depositModal', 'withdrawModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    closeModal(modalId);
+                }
+            });
+        }
+    </script>
+</body>
+</html> 

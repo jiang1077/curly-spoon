@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoinBit - 管理后台</title>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f6fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        /* 页面布局 */
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 左侧导航栏 */
+        .sidebar {
+            width: 260px;
+            background: #2c3e50;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #34495e;
+        }
+
+        .sidebar-brand {
+            color: #3498db;
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 25px;
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #34495e;
+            color: #3498db;
+            border-left-color: #3498db;
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            min-height: 100vh;
+            background: #f5f6fa;
+        }
+
+        /* 顶部导航栏 */
+        .navbar {
+            background: #ffffff;
+            border-bottom: 1px solid #e0e6ed;
+            padding: 0 30px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-left h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #7f8c8d;
+        }
+
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        /* 内容区域 */
+        .content-area {
+            padding: 30px;
+        }
+
+        /* 欢迎卡片 */
+        .welcome-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .welcome-title {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .welcome-desc {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-left: 4px solid #3498db;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .stat-card:nth-child(2) { border-left-color: #2ecc71; }
+        .stat-card:nth-child(3) { border-left-color: #f39c12; }
+        .stat-card:nth-child(4) { border-left-color: #e74c3c; }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-title {
+            color: #7f8c8d;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .stat-icon.blue { background: rgba(52, 152, 219, 0.1); color: #3498db; }
+        .stat-icon.green { background: rgba(46, 204, 113, 0.1); color: #2ecc71; }
+        .stat-icon.orange { background: rgba(243, 156, 18, 0.1); color: #f39c12; }
+        .stat-icon.red { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        /* 快速操作 */
+        .quick-actions {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .quick-actions h3 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #495057;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #3498db;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .action-icon {
+            width: 35px;
+            height: 35px;
+            background: #3498db;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover .action-icon {
+            background: white;
+            color: #3498db;
+        }
+
+        /* 时间显示 */
+        .time-display {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #3498db;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .sidebar-brand span {
+                display: none;
+            }
+
+            .nav-link span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+
+            .navbar {
+                padding: 0 15px;
+            }
+
+            .content-area {
+                padding: 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- 左侧导航栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <i class="fas fa-chart-line"></i>
+                    <span>CoinBit</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-item">
+                    <a href="admin_permissions.html" class="nav-link">
+                        <i class="fas fa-user-shield"></i>
+                        <span>权限管理</span>
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a href="admin_users.html" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        <span>用户管理</span>
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a href="admin_finance.html" class="nav-link">
+                        <i class="fas fa-wallet"></i>
+                        <span>财务管理</span>
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a href="admin_orders.html" class="nav-link">
+                        <i class="fas fa-list-alt"></i>
+                        <span>订单管理</span>
+                    </a>
+                </div>
+
+                <div class="nav-item">
+                    <a href="admin_plugins.html" class="nav-link">
+                        <i class="fas fa-puzzle-piece"></i>
+                        <span>插件管理</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 主要内容区域 -->
+        <main class="main-content">
+            <!-- 顶部导航栏 -->
+            <nav class="navbar">
+                <div class="navbar-left">
+                    <h1>管理后台</h1>
+                </div>
+                <div class="navbar-right">
+                    <div class="admin-info">
+                        <div class="admin-avatar">A</div>
+                        <span>超级管理员</span>
+                    </div>
+                    <button class="logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        退出
+                    </button>
+                </div>
+            </nav>
+
+            <!-- 内容区域 -->
+            <div class="content-area">
+                <!-- 欢迎卡片 -->
+                <div class="welcome-card">
+                    <h2 class="welcome-title">欢迎回来！</h2>
+                    <p class="welcome-desc">CoinBit数字期权交易平台管理中心，今日一切运行正常</p>
+                </div>
+
+                <!-- 统计卡片 -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">总用户数</span>
+                            <div class="stat-icon blue">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" id="totalUsers">1,247</div>
+                        <div class="stat-change">较昨日 +12</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">在线用户</span>
+                            <div class="stat-icon green">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" id="onlineUsers">89</div>
+                        <div class="stat-change">当前在线</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">今日订单</span>
+                            <div class="stat-icon orange">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" id="todayOrders">156</div>
+                        <div class="stat-change">较昨日 +8%</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">待审核</span>
+                            <div class="stat-icon red">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" id="pendingItems">23</div>
+                        <div class="stat-change">需要处理</div>
+                    </div>
+                </div>
+
+                <!-- 快速操作 -->
+                <div class="quick-actions">
+                    <h3>快速操作</h3>
+                    <div class="actions-grid">
+                        <a href="admin_permissions.html" class="action-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600;">权限管理</div>
+                                <div style="font-size: 12px; color: #7f8c8d;">管理员权限设置</div>
+                            </div>
+                        </a>
+
+                        <a href="admin_users.html" class="action-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600;">用户管理</div>
+                                <div style="font-size: 12px; color: #7f8c8d;">用户审核与管理</div>
+                            </div>
+                        </a>
+
+                        <a href="admin_finance.html" class="action-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600;">财务管理</div>
+                                <div style="font-size: 12px; color: #7f8c8d;">充值地址与资金审核</div>
+                            </div>
+                        </a>
+
+                        <a href="admin_orders.html" class="action-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-list-alt"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600;">订单管理</div>
+                                <div style="font-size: 12px; color: #7f8c8d;">查看修改订单信息</div>
+                            </div>
+                        </a>
+
+                        <a href="admin_plugins.html" class="action-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-puzzle-piece"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600;">插件管理</div>
+                                <div style="font-size: 12px; color: #7f8c8d;">安装管理系统插件</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 时间显示 -->
+    <div class="time-display" id="timeDisplay">
+        <i class="fas fa-clock"></i>
+        <span id="currentTime"></span>
+    </div>
+
+    <script>
+        // 统计数字动画
+        function animateNumbers() {
+            const counters = [
+                { id: 'totalUsers', target: 1247 },
+                { id: 'onlineUsers', target: 89 },
+                { id: 'todayOrders', target: 156 },
+                { id: 'pendingItems', target: 23 }
+            ];
+
+            counters.forEach(counter => {
+                const element = document.getElementById(counter.id);
+                let current = 0;
+                const increment = counter.target / 60;
+                
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= counter.target) {
+                        current = counter.target;
+                        clearInterval(timer);
+                    }
+                    element.textContent = Math.floor(current).toLocaleString();
+                }, 30);
+            });
+        }
+
+        // 更新时间显示
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('currentTime').textContent = timeString;
+        }
+
+        // 设置当前页面导航高亮
+        function setActiveNav() {
+            const currentPage = window.location.pathname.split('/').pop();
+            if (currentPage === 'admin_dashboard_test.html' || currentPage === '') {
+                // 首页不设置任何导航项为活跃状态，或者可以添加一个首页导航项
+                return;
+            }
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('href') === currentPage) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // 退出登录
+        function logout() {
+            if (confirm('确认退出管理系统？')) {
+                alert('已安全退出管理系统');
+                window.location.href = 'admin_login_test.html';
+            }
+        }
+
+        // 页面加载完成后执行
+        window.addEventListener('load', function() {
+            animateNumbers();
+            updateTime();
+            setActiveNav();
+            
+            // 每秒更新时间
+            setInterval(updateTime, 1000);
+            
+            // 每30秒更新统计数据
+            setInterval(() => {
+                // 模拟数据变化
+                const elements = ['totalUsers', 'onlineUsers', 'todayOrders', 'pendingItems'];
+                elements.forEach(id => {
+                    const element = document.getElementById(id);
+                    const current = parseInt(element.textContent.replace(',', ''));
+                    const variation = Math.floor(Math.random() * 10) - 5;
+                    const newValue = Math.max(0, current + variation);
+                    element.textContent = newValue.toLocaleString();
+                });
+            }, 30000);
+        });
+    </script>
+</body>
+</html> 

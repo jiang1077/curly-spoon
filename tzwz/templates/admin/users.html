@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoinBit - 用户管理</title>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        /* 顶部导航栏 */
+        .navbar {
+            background: rgba(42, 42, 42, 0.95);
+            border-bottom: 1px solid #404040;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #00C851;
+            text-decoration: none;
+        }
+
+        .navbar-brand i {
+            font-size: 24px;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ccc;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #00C851, #007E33);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            color: #ff4444;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: #00C851;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* 筛选和搜索区域 */
+        .filters-section {
+            background: rgba(42, 42, 42, 0.8);
+            border: 1px solid #404040;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: 1fr 200px 200px 120px;
+            gap: 16px;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            color: #ccc;
+            font-weight: 500;
+        }
+
+        .form-input, .form-select {
+            background: #1a1a1a;
+            border: 2px solid #404040;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #ffffff;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #00C851;
+            box-shadow: 0 0 0 3px rgba(0, 200, 81, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #666;
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #00C851, #007E33);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: fit-content;
+        }
+
+        .search-btn:hover {
+            background: linear-gradient(135deg, #007E33, #00C851);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 200, 81, 0.3);
+        }
+
+        /* 统计信息 */
+        .stats-bar {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: rgba(42, 42, 42, 0.6);
+            border-radius: 8px;
+            border: 1px solid #404040;
+        }
+
+        .stat-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .stat-icon.total {
+            background: rgba(0, 200, 81, 0.1);
+            color: #00C851;
+        }
+
+        .stat-icon.pending {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .stat-icon.active {
+            background: rgba(0, 123, 255, 0.1);
+            color: #007bff;
+        }
+
+        .stat-text {
+            font-size: 14px;
+        }
+
+        .stat-value {
+            font-weight: 600;
+        }
+
+        /* 用户表格 */
+        .users-table-container {
+            background: rgba(42, 42, 42, 0.8);
+            border: 1px solid #404040;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #404040;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00C851, #007E33);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #007E33, #00C851);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(108, 117, 125, 0.1);
+            border: 1px solid #6c757d;
+            color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(108, 117, 125, 0.2);
+            color: #ffffff;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th,
+        .users-table td {
+            padding: 16px 24px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+
+        .users-table th {
+            background: rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .users-table td {
+            font-size: 14px;
+        }
+
+        .users-table tr:hover {
+            background: rgba(0, 200, 81, 0.05);
+        }
+
+        .user-avatar-table {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00C851, #007E33);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .user-info-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .user-name {
+            font-weight: 500;
+        }
+
+        .user-email {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(0, 200, 81, 0.1);
+            color: #00C851;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .status-disabled {
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+        }
+
+        .status-rejected {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-success {
+            background: rgba(0, 200, 81, 0.1);
+            border: 1px solid rgba(0, 200, 81, 0.3);
+            color: #00C851;
+        }
+
+        .btn-success:hover {
+            background: rgba(0, 200, 81, 0.2);
+            color: #00C851;
+        }
+
+        .btn-warning {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            color: #ffc107;
+        }
+
+        .btn-warning:hover {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .btn-danger {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            color: #ff4444;
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+        }
+
+        .btn-info {
+            background: rgba(0, 123, 255, 0.1);
+            border: 1px solid rgba(0, 123, 255, 0.3);
+            color: #007bff;
+        }
+
+        .btn-info:hover {
+            background: rgba(0, 123, 255, 0.2);
+            color: #007bff;
+        }
+
+        /* 分页 */
+        .pagination-container {
+            padding: 20px 24px;
+            border-top: 1px solid #404040;
+            display: flex;
+            align-items: center;
+            justify-content: between;
+        }
+
+        .pagination-info {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .page-btn {
+            padding: 8px 12px;
+            background: rgba(42, 42, 42, 0.8);
+            border: 1px solid #404040;
+            border-radius: 6px;
+            color: #ccc;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover {
+            background: rgba(0, 200, 81, 0.1);
+            border-color: #00C851;
+            color: #00C851;
+        }
+
+        .page-btn.active {
+            background: #00C851;
+            border-color: #00C851;
+            color: white;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 16px;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-bar {
+                flex-wrap: wrap;
+            }
+
+            .users-table-container {
+                overflow-x: auto;
+            }
+
+            .users-table {
+                min-width: 800px;
+            }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #404040;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+        <a href="{{ url_for('admin.dashboard') }}" class="navbar-brand">
+            <i class="fas fa-chart-line"></i>
+            CoinBit 管理后台
+        </a>
+        <div class="navbar-user">
+            <div class="user-info">
+                <div class="user-avatar">{{ current_user.username[0].upper() }}</div>
+                <span>{{ current_user.username }}</span>
+            </div>
+            <a href="{{ url_for('admin.logout') }}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                退出
+            </a>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <div class="main-content">
+        <!-- 页面标题 -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">用户管理</h1>
+                <div class="breadcrumb">
+                    <a href="{{ url_for('admin.dashboard') }}">仪表板</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <span>用户管理</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 筛选和搜索 -->
+        <div class="filters-section">
+            <form method="GET" action="{{ url_for('admin.users') }}">
+                <div class="filters-grid">
+                    <div class="form-group">
+                        <label class="form-label">搜索用户</label>
+                        <input type="text" name="search" class="form-input" 
+                               placeholder="用户名、邮箱或手机号" 
+                               value="{{ search_query or '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">用户状态</label>
+                        <select name="status" class="form-select">
+                            <option value="all" {{ 'selected' if current_status == 'all' else '' }}>全部状态</option>
+                            <option value="active" {{ 'selected' if current_status == 'active' else '' }}>已激活</option>
+                            <option value="pending" {{ 'selected' if current_status == 'pending' else '' }}>待审核</option>
+                            <option value="disabled" {{ 'selected' if current_status == 'disabled' else '' }}>已禁用</option>
+                            <option value="rejected" {{ 'selected' if current_status == 'rejected' else '' }}>已拒绝</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">注册时间</label>
+                        <select name="date_range" class="form-select">
+                            <option value="all">全部时间</option>
+                            <option value="today">今天</option>
+                            <option value="week">本周</option>
+                            <option value="month">本月</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i>
+                        搜索
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 统计信息 -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-icon total">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-text">
+                    总用户: <span class="stat-value">{{ pagination.total }}</span>
+                </div>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-icon pending">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-text">
+                    待审核: <span class="stat-value">{{ users|selectattr('status.value', 'equalto', 'pending')|list|length }}</span>
+                </div>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-icon active">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="stat-text">
+                    已激活: <span class="stat-value">{{ users|selectattr('status.value', 'equalto', 'active')|list|length }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 用户表格 -->
+        <div class="users-table-container">
+            <div class="table-header">
+                <h3 class="table-title">用户列表</h3>
+                <div class="table-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="exportUsers()">
+                        <i class="fas fa-download"></i>
+                        导出
+                    </button>
+                    <a href="{{ url_for('admin.users', status='pending') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-user-clock"></i>
+                        待审核用户
+                    </a>
+                </div>
+            </div>
+
+            {% if users %}
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>用户信息</th>
+                        <th>联系方式</th>
+                        <th>状态</th>
+                        <th>注册时间</th>
+                        <th>最后登录</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>
+                            <div class="user-info-cell">
+                                <div class="user-avatar-table">{{ user.username[0].upper() }}</div>
+                                <div class="user-details">
+                                    <div class="user-name">{{ user.username }}</div>
+                                    <div class="user-email">ID: {{ user.id }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="user-details">
+                                <div>{{ user.email or '未设置' }}</div>
+                                <div class="user-email">{{ user.phone or '未设置' }}</div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if user.status.value == 'active' %}
+                                <span class="status-badge status-active">已激活</span>
+                            {% elif user.status.value == 'pending' %}
+                                <span class="status-badge status-pending">待审核</span>
+                            {% elif user.status.value == 'disabled' %}
+                                <span class="status-badge status-disabled">已禁用</span>
+                            {% elif user.status.value == 'rejected' %}
+                                <span class="status-badge status-rejected">已拒绝</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else '从未登录' }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{{ url_for('admin.user_detail', user_id=user.id) }}" 
+                                   class="btn btn-info btn-sm" title="查看详情">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                
+                                {% if user.status.value == 'pending' %}
+                                    <a href="{{ url_for('admin.verify_user', user_id=user.id, action='approve') }}" 
+                                       class="btn btn-success btn-sm" title="通过审核"
+                                       onclick="return confirm('确认通过审核？')">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                    <a href="{{ url_for('admin.verify_user', user_id=user.id, action='reject') }}" 
+                                       class="btn btn-danger btn-sm" title="拒绝审核"
+                                       onclick="return confirm('确认拒绝审核？')">
+                                        <i class="fas fa-times"></i>
+                                    </a>
+                                {% elif user.status.value == 'active' %}
+                                    <a href="{{ url_for('admin.verify_user', user_id=user.id, action='disable') }}" 
+                                       class="btn btn-warning btn-sm" title="禁用用户"
+                                       onclick="return confirm('确认禁用用户？')">
+                                        <i class="fas fa-ban"></i>
+                                    </a>
+                                {% elif user.status.value == 'disabled' %}
+                                    <a href="{{ url_for('admin.verify_user', user_id=user.id, action='enable') }}" 
+                                       class="btn btn-success btn-sm" title="启用用户"
+                                       onclick="return confirm('确认启用用户？')">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- 分页 -->
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    显示 {{ pagination.per_page * (pagination.page - 1) + 1 }} - 
+                    {{ pagination.per_page * pagination.page if pagination.page < pagination.pages else pagination.total }} 
+                    共 {{ pagination.total }} 条记录
+                </div>
+                
+                {% if pagination.pages > 1 %}
+                <div class="pagination">
+                    {% if pagination.has_prev %}
+                        <a href="{{ url_for('admin.users', page=pagination.prev_num, status=current_status, search=search_query) }}" 
+                           class="page-btn">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    {% endif %}
+                    
+                    {% for page_num in pagination.iter_pages() %}
+                        {% if page_num %}
+                            {% if page_num != pagination.page %}
+                                <a href="{{ url_for('admin.users', page=page_num, status=current_status, search=search_query) }}" 
+                                   class="page-btn">{{ page_num }}</a>
+                            {% else %}
+                                <span class="page-btn active">{{ page_num }}</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="page-btn">…</span>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if pagination.has_next %}
+                        <a href="{{ url_for('admin.users', page=pagination.next_num, status=current_status, search=search_query) }}" 
+                           class="page-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div style="padding: 60px; text-align: center; color: #888;">
+                <i class="fas fa-users" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                <h3>暂无用户数据</h3>
+                <p>没有找到符合条件的用户</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // 导出用户数据
+        function exportUsers() {
+            const params = new URLSearchParams(window.location.search);
+            params.set('export', 'csv');
+            window.open(`${window.location.pathname}?${params.toString()}`);
+        }
+
+        // 批量操作
+        function bulkAction(action) {
+            const checkboxes = document.querySelectorAll('input[name="user_ids"]:checked');
+            if (checkboxes.length === 0) {
+                alert('请选择要操作的用户');
+                return;
+            }
+            
+            const userIds = Array.from(checkboxes).map(cb => cb.value);
+            const confirmMessage = `确认对 ${userIds.length} 个用户执行 ${action} 操作？`;
+            
+            if (confirm(confirmMessage)) {
+                // 发送批量操作请求
+                fetch('/admin/api/bulk_user_action', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: action,
+                        user_ids: userIds
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        location.reload();
+                    } else {
+                        alert('操作失败: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('操作失败');
+                });
+            }
+        }
+
+        // 实时搜索
+        let searchTimeout;
+        document.querySelector('input[name="search"]').addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                if (e.target.value.length >= 2 || e.target.value.length === 0) {
+                    e.target.form.submit();
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html> 

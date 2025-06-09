@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShareOption - 合约订单</title>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(180deg, #1a1a1a 0%, #000000 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        /* 顶部标题栏 */
+        .header {
+            background: #1a1a1a;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .header-title {
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .filter-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: #2a2a2a;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .filter-btn:hover {
+            background: #404040;
+            color: #ffffff;
+        }
+
+        /* 分类标签 */
+        .category-tabs {
+            background: #1a1a1a;
+            padding: 15px 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        .tab-list {
+            display: flex;
+            gap: 20px;
+        }
+
+        .tab-item {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 8px 0;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .tab-item.active {
+            color: #00C851;
+        }
+
+        .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #00C851;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            height: calc(100vh - 60px - 80px - 60px);
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* 统计卡片 */
+        .stats-card {
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #404040;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .profit { color: #00C851; }
+        .loss { color: #ff4444; }
+        .neutral { color: #ffc107; }
+
+        /* 订单列表 */
+        .order-list {
+            background: #2a2a2a;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .list-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #404040;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .list-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .order-count {
+            background: #00C851;
+            color: white;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .order-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid #404040;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-item:hover {
+            background: #404040;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .order-symbol {
+            display: flex;
+            align-items: center;
+        }
+
+        .symbol-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .btc-icon { background: linear-gradient(135deg, #f7931a, #e6860a); }
+        .eth-icon { background: linear-gradient(135deg, #627eea, #5a73d8); }
+        .ltc-icon { background: linear-gradient(135deg, #bfbbbb, #a6a6a6); }
+        .xrp-icon { background: linear-gradient(135deg, #23292f, #1a1f24); }
+
+        .symbol-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .order-status {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .status-win {
+            background: #00C851;
+            color: white;
+        }
+
+        .status-loss {
+            background: #ff4444;
+            color: white;
+        }
+
+        .status-processing {
+            background: #007bff;
+            color: white;
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .detail-item {
+            font-size: 12px;
+        }
+
+        .detail-label {
+            color: #888;
+            margin-right: 4px;
+        }
+
+        .detail-value {
+            color: #ffffff;
+        }
+
+        .direction-up {
+            color: #00C851;
+        }
+
+        .direction-down {
+            color: #ff4444;
+        }
+
+        .order-result {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 8px;
+            border-top: 1px solid #404040;
+            margin-top: 8px;
+        }
+
+        .result-pnl {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .result-time {
+            font-size: 11px;
+            color: #888;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .empty-desc {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .trade-now-btn {
+            background: linear-gradient(135deg, #00C851, #007E33);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            display: flex;
+            background: #1a1a1a;
+            border-top: 1px solid #333;
+            height: 80px;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            text-decoration: none;
+            font-size: 12px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #00C851;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        /* 滚动条样式 */
+        .main-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .main-content::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        .main-content::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 2px;
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #888;
+        }
+
+        .loading i {
+            margin-right: 8px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .order-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部标题栏 -->
+    <div class="header">
+        <div class="header-title">Contract</div>
+    </div>
+
+    <!-- 分类标签 -->
+    <div class="category-tabs">
+        <div class="tab-list">
+            <button class="tab-item active" data-category="all">全部</button>
+            <button class="tab-item" data-category="current">持仓中</button>
+            <button class="tab-item" data-category="history">历史订单</button>
+        </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <div class="main-content">
+        <!-- 统计卡片 -->
+        <div class="stats-card">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value profit" id="totalProfit">+2,456.78</div>
+                    <div class="stat-label">总盈亏 (USDT)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value neutral" id="totalOrders">124</div>
+                    <div class="stat-label">总订单数</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 订单列表 -->
+        <div class="order-list" id="orderList">
+            <div class="list-header">
+                <div class="list-title">我的订单</div>
+                <div class="order-count" id="orderCount">6</div>
+            </div>
+            
+            <!-- 订单项将通过JavaScript动态生成 -->
+            <div id="orderItems">
+                <!-- 动态内容 -->
+            </div>
+        </div>
+
+        <!-- 加载动画 -->
+        <div class="loading" id="loadingIndicator" style="display: none;">
+            <i class="fas fa-spinner"></i>
+            <span>加载中...</span>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <a href="#" class="nav-item" onclick="goToHome()">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="#" class="nav-item" onclick="goToMarket()">
+            <i class="fas fa-chart-line"></i>
+            <span>Market</span>
+        </a>
+        <a href="#" class="nav-item active">
+            <i class="fas fa-file-contract"></i>
+            <span>Contract</span>
+        </a>
+        <a href="#" class="nav-item" onclick="goToTrade()">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Trade</span>
+        </a>
+        <a href="#" class="nav-item" onclick="goToWallet()">
+            <i class="fas fa-wallet"></i>
+            <span>Wallet</span>
+        </a>
+    </div>
+
+    <script>
+        // 模拟订单数据
+        const orderData = {
+            current: [
+                {
+                    id: '20240115001',
+                    symbol: 'BTC/USDT',
+                    icon: 'btc-icon',
+                    iconText: '₿',
+                    direction: 'Rise',
+                    amount: 500,
+                    openPrice: 86345.20,
+                    duration: '60s',
+                    startTime: '14:25:30',
+                    endTime: '14:26:30',
+                    status: 'processing',
+                    remaining: 25
+                },
+                {
+                    id: '20240115002',
+                    symbol: 'ETH/USDT',
+                    icon: 'eth-icon',
+                    iconText: 'Ξ',
+                    direction: 'Fall',
+                    amount: 300,
+                    openPrice: 3245.67,
+                    duration: '120s',
+                    startTime: '14:23:45',
+                    endTime: '14:25:45',
+                    status: 'processing',
+                    remaining: 85
+                }
+            ],
+            history: [
+                {
+                    id: '20240114001',
+                    symbol: 'BTC/USDT',
+                    icon: 'btc-icon',
+                    iconText: '₿',
+                    direction: 'Rise',
+                    amount: 1000,
+                    openPrice: 85234.50,
+                    closePrice: 85456.20,
+                    duration: '300s',
+                    startTime: '13:45:20',
+                    endTime: '13:50:20',
+                    status: 'win',
+                    pnl: 750,
+                    date: '2024-01-14'
+                },
+                {
+                    id: '20240114002',
+                    symbol: 'ETH/USDT',
+                    icon: 'eth-icon',
+                    iconText: 'Ξ',
+                    direction: 'Fall',
+                    amount: 500,
+                    openPrice: 3198.45,
+                    closePrice: 3210.12,
+                    duration: '180s',
+                    startTime: '12:30:15',
+                    endTime: '12:33:15',
+                    status: 'loss',
+                    pnl: -500,
+                    date: '2024-01-14'
+                },
+                {
+                    id: '20240113001',
+                    symbol: 'LTC/USDT',
+                    icon: 'ltc-icon',
+                    iconText: 'Ł',
+                    direction: 'Rise',
+                    amount: 800,
+                    openPrice: 144.23,
+                    closePrice: 145.89,
+                    duration: '600s',
+                    startTime: '16:20:10',
+                    endTime: '16:30:10',
+                    status: 'win',
+                    pnl: 640,
+                    date: '2024-01-13'
+                },
+                {
+                    id: '20240113002',
+                    symbol: 'XRP/USDT',
+                    icon: 'xrp-icon',
+                    iconText: '◉',
+                    direction: 'Fall',
+                    amount: 600,
+                    openPrice: 0.6234,
+                    closePrice: 0.6201,
+                    duration: '90s',
+                    startTime: '11:15:30',
+                    endTime: '11:17:00',
+                    status: 'win',
+                    pnl: 450,
+                    date: '2024-01-13'
+                }
+            ]
+        };
+
+        let currentCategory = 'all';
+
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            renderOrderList();
+            bindTabEvents();
+            bindNavEvents();
+            
+            // 每秒更新持仓中的倒计时
+            setInterval(updateCountdown, 1000);
+        });
+
+        // 渲染订单列表
+        function renderOrderList() {
+            const orderItems = document.getElementById('orderItems');
+            orderItems.innerHTML = '';
+
+            let dataToShow = [];
+            
+            if (currentCategory === 'all') {
+                dataToShow = [...orderData.current, ...orderData.history];
+            } else if (currentCategory === 'current') {
+                dataToShow = orderData.current;
+            } else {
+                dataToShow = orderData.history;
+            }
+
+            if (dataToShow.length === 0) {
+                orderItems.innerHTML = createEmptyState();
+                document.getElementById('orderCount').textContent = '0';
+                return;
+            }
+
+            document.getElementById('orderCount').textContent = dataToShow.length;
+
+            dataToShow.forEach(order => {
+                const orderItem = createOrderItem(order);
+                orderItems.appendChild(orderItem);
+            });
+        }
+
+        // 创建订单项
+        function createOrderItem(order) {
+            const item = document.createElement('div');
+            item.className = 'order-item';
+            item.onclick = () => showOrderDetail(order);
+
+            const statusClass = `status-${order.status}`;
+            const statusText = getStatusText(order.status);
+            
+            const directionClass = order.direction === 'Rise' ? 'direction-up' : 'direction-down';
+            const directionIcon = order.direction === 'Rise' ? '↗' : '↘';
+
+            let statusInfo = '';
+            if (order.status === 'processing') {
+                statusInfo = `<div class="result-time">剩余 ${order.remaining}s</div>`;
+            } else if (order.status === 'win' || order.status === 'loss') {
+                const pnlClass = order.pnl > 0 ? 'profit' : 'loss';
+                statusInfo = `
+                    <div class="result-pnl ${pnlClass}">
+                        ${order.pnl > 0 ? '+' : ''}${order.pnl.toFixed(2)} USDT
+                    </div>
+                    <div class="result-time">${order.date || '今日'}</div>
+                `;
+            }
+
+            item.innerHTML = `
+                <div class="order-header">
+                    <div class="order-symbol">
+                        <div class="symbol-icon ${order.icon}">
+                            ${order.iconText}
+                        </div>
+                        <div class="symbol-name">${order.symbol}</div>
+                    </div>
+                    <div class="order-status ${statusClass}">${statusText}</div>
+                </div>
+                
+                <div class="order-details">
+                    <div class="detail-item">
+                        <span class="detail-label">方向:</span>
+                        <span class="detail-value ${directionClass}">
+                            ${directionIcon} ${order.direction}
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">金额:</span>
+                        <span class="detail-value">${order.amount} USDT</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">开仓价:</span>
+                        <span class="detail-value">${order.openPrice}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">时长:</span>
+                        <span class="detail-value">${order.duration}</span>
+                    </div>
+                </div>
+                
+                <div class="order-result">
+                    <div class="result-time">
+                        ${order.startTime} - ${order.endTime}
+                    </div>
+                    ${statusInfo}
+                </div>
+            `;
+
+            return item;
+        }
+
+        // 获取状态文本
+        function getStatusText(status) {
+            const statusMap = {
+                'processing': '进行中',
+                'win': '盈利',
+                'loss': '亏损',
+                'pending': '待开始'
+            };
+            return statusMap[status] || status;
+        }
+
+        // 创建空状态
+        function createEmptyState() {
+            return `
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-file-contract"></i>
+                    </div>
+                    <div class="empty-text">暂无订单</div>
+                    <div class="empty-desc">您还没有任何交易订单</div>
+                    <button class="trade-now-btn" onclick="goToTrade()">
+                        立即交易
+                    </button>
+                </div>
+            `;
+        }
+
+        // 更新倒计时
+        function updateCountdown() {
+            if (currentCategory === 'current' || currentCategory === 'all') {
+                orderData.current.forEach(order => {
+                    if (order.remaining > 0) {
+                        order.remaining--;
+                        if (order.remaining === 0) {
+                            // 模拟结算
+                            settleOrder(order);
+                        }
+                    }
+                });
+                
+                // 重新渲染以更新倒计时显示
+                if (document.getElementById('orderItems').children.length > 0) {
+                    renderOrderList();
+                }
+            }
+        }
+
+        // 模拟订单结算
+        function settleOrder(order) {
+            const isWin = Math.random() > 0.5;
+            order.status = isWin ? 'win' : 'loss';
+            order.pnl = isWin ? order.amount * 0.75 : -order.amount;
+            order.closePrice = order.openPrice * (1 + (Math.random() - 0.5) * 0.02);
+            order.date = new Date().toISOString().split('T')[0];
+            
+            // 移动到历史记录
+            orderData.history.unshift(order);
+            orderData.current = orderData.current.filter(o => o.id !== order.id);
+            
+            // 更新统计
+            updateStats();
+        }
+
+        // 更新统计数据
+        function updateStats() {
+            const allHistory = orderData.history;
+            const totalOrders = allHistory.length;
+            const totalPnl = allHistory.reduce((sum, o) => sum + (o.pnl || 0), 0);
+            
+            document.getElementById('totalProfit').textContent = 
+                (totalPnl >= 0 ? '+' : '') + totalPnl.toFixed(2);
+            document.getElementById('totalProfit').className = 
+                'stat-value ' + (totalPnl >= 0 ? 'profit' : 'loss');
+            document.getElementById('totalOrders').textContent = totalOrders;
+        }
+
+        // 显示订单详情
+        function showOrderDetail(order) {
+            let detailText = `订单详情\n\n`;
+            detailText += `订单号: ${order.id}\n`;
+            detailText += `交易对: ${order.symbol}\n`;
+            detailText += `方向: ${order.direction}\n`;
+            detailText += `金额: ${order.amount} USDT\n`;
+            detailText += `开仓价: ${order.openPrice}\n`;
+            
+            if (order.closePrice) {
+                detailText += `平仓价: ${order.closePrice}\n`;
+            }
+            
+            detailText += `时长: ${order.duration}\n`;
+            detailText += `状态: ${getStatusText(order.status)}\n`;
+            
+            if (order.pnl !== undefined) {
+                detailText += `盈亏: ${order.pnl > 0 ? '+' : ''}${order.pnl.toFixed(2)} USDT\n`;
+            }
+            
+            if (order.remaining > 0) {
+                detailText += `剩余时间: ${order.remaining}秒\n`;
+            }
+            
+            alert(detailText);
+        }
+
+        // 绑定分类标签事件
+        function bindTabEvents() {
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    currentCategory = this.dataset.category;
+                    
+                    showLoading();
+                    setTimeout(() => {
+                        renderOrderList();
+                        hideLoading();
+                    }, 300);
+                });
+            });
+        }
+
+        // 显示加载动画
+        function showLoading() {
+            document.getElementById('loadingIndicator').style.display = 'flex';
+            document.getElementById('orderItems').style.opacity = '0.5';
+        }
+
+        // 隐藏加载动画
+        function hideLoading() {
+            document.getElementById('loadingIndicator').style.display = 'none';
+            document.getElementById('orderItems').style.opacity = '1';
+        }
+
+        // 导航功能
+        function goToHome() {
+            window.open('home_demo.html', '_blank');
+        }
+
+        function goToMarket() {
+            window.open('market_demo.html', '_blank');
+        }
+
+        function goToTrade() {
+            window.open('trading_demo.html', '_blank');
+        }
+
+        function goToWallet() {
+            window.open('wallet_demo.html', '_blank');
+        }
+
+        // 绑定导航事件
+        function bindNavEvents() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (!this.classList.contains('active')) {
+                        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                        this.classList.add('active');
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html> 
